@@ -3589,3 +3589,2773 @@ window.TMSProcessing.getPageURLWindow = function () { // remove this line for in
     };
 };
 
+// +++++++++++++++++++++++++++++++++++++++++++++++++++++++
+// 1102 TMSProcessing.getPageURLCanonical
+// Issued by: Agnosticalyze
+// version: 2.3, 2021-05-15
+// +++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    
+// Get canonical URL
+window.TMSProcessing = window.TMSProcessing || {}; // remove this line if function is included inside a collection wrapper
+window.TMSProcessing.getPageURLCanonical = function () { // remove this line for including function inside a collection wrapper
+// function getPageURLCanonical() {  // uncomment this line for including function inside a collection wrapper
+    try {
+        window.TMSHelper.console("[TMSProcessing.getPageURLCanonical] start");
+              
+        if(typeof window.TMSEvent === "object") {
+            // create processing flag
+            var processingFlag = false;
+          
+            if (typeof window.TMSEvent['page_url_canonical_url'] === "string" && window.TMSEvent['page_url_canonical_url'] !== "") {
+                // 1 canonical URL is already defined in TMSEvent
+                window.TMSHelper.console("[TMSProcessing.getPageURLCanonical] -> info: Canonical URL found in TMSEvent");
+              
+                // 1.1 check if URL is valid and complete
+                var startWithProtocol = new RegExp("^[a-zA-Z]*:");
+                if (startWithProtocol.test(window.TMSEvent['page_url_canonical_url'])) {
+                    // 1.1.1 slash TMSEvent full URL into temporary URL variables
+                    var slashedUrl = window.TMSHelper.URLslasher(window.TMSEvent['page_url_canonical_url']);
+          
+                    // 1.1.2 copy to TMSEvent
+                    window.TMSEvent = window.TMSHelper.copyVarsFromObjectToObject({
+                              sourceObject: slashedUrl
+                            , mergeObject: window.TMSEvent
+                            , targetPrefix: "page_url_canonical_"
+                            , overwrite: true
+                            , harmonize: false
+                            , includeFromSource: {}
+                            , excludeFromSource: {}
+                            , includeFromMerge: {}
+                            , excludeFromMerge: {}
+                            , flatten: false
+                        });
+          
+                    // 1.1.3 set processing flag
+                    processingFlag = true;
+                } else {         
+                    window.TMSHelper.console("[TMSProcessing.getPageURLCanonical] -> warning: TMSEvent[page_url_canonical_url] does not seem to be a valid absolute URL, checking for URL parts in TMSEvent next");
+                          
+                    // do not set processing flag
+                    processingFlag = false;
+                }
+            } else {
+                window.TMSHelper.console("[TMSProcessing.getPageURLCanonical] -> info: TMSEvent[page_url_canonical_url] not found, checking for URL parts in TMSEvent next");
+                      
+                // do not set processing flag
+                processingFlag = false;
+            }
+          
+            if (!processingFlag) {
+                if (
+                       (typeof window.TMSEvent['page_url_canonical_protocol'] === "string"             && window.TMSEvent['page_url_canonical_protocol'] !== "")
+                    || (typeof window.TMSEvent['page_url_canonical_hostname'] === "string"             && window.TMSEvent['page_url_canonical_hostname'] != "")
+                    || (typeof window.TMSEvent['page_url_canonical_path'] === "string"                 && window.TMSEvent['page_url_canonical_path'] !== "")
+                    || (typeof window.TMSEvent['page_url_canonical_queryString'] === "string"          && window.TMSEvent['page_url_canonical_queryString'] !== "")
+                    || (typeof window.TMSEvent['page_url_canonical_fragmentIdentifier'] === "string"   && window.TMSEvent['page_url_canonical_fragmentIdentifier'] !== "")
+                    ) {
+                    // get URL of canonical tag
+                    var canonicalTagUrl = window.TMSHelper.getURLFromHtmlElement("canonical", null);
+          
+                    // 2 canonical URL parts are already defined in TMSEvent
+                    window.TMSHelper.console("[TMSProcessing.getPageURLCanonical] -> info: (at least one) Canonical URL Part found in TMSEvent");
+                    var reverseOrderedAttributes = ["fragmentIdentifier", "queryString", "path", "hostname", "protocol"];
+          
+                    // 2.1 get URL to merge with, either from TMSCache, canonicla tag or TMSEvent
+                    if ( typeof window.TMSCache !== 'undefined' && (
+                               (typeof window.TMSCache['page_url_canonical_protocol'] === "string"             && window.TMSCache['page_url_canonical_protocol'] !== "")
+                            || (typeof window.TMSCache['page_url_canonical_hostname'] === "string"             && window.TMSCache['page_url_canonical_hostname'] != "")
+                            || (typeof window.TMSCache['page_url_canonical_path'] === "string"                 && window.TMSCache['page_url_canonical_path'] !== "")
+                            || (typeof window.TMSCache['page_url_canonical_queryString'] === "string"          && window.TMSCache['page_url_canonical_queryString'] !== "")
+                            || (typeof window.TMSCache['page_url_canonical_fragmentIdentifier'] === "string"   && window.TMSCache['page_url_canonical_fragmentIdentifier'] !== "")
+                            )
+                        ) {
+                        // 2.1.1 use vars from TMSCache as reference
+                        var mergeObject = [];
+                        mergeObject['protocol'] = window.TMSCache['page_url_canonical_protocol'] || "";
+                        mergeObject['hostname'] = window.TMSCache['page_url_canonical_hostname'] || "";
+                        mergeObject['path'] = window.TMSCache['page_url_canonical_path'] || "";
+                        mergeObject['queryString'] = window.TMSCache['page_url_canonical_queryString'] || "";
+                        mergeObject['fragmentIdentifier'] = window.TMSCache['page_url_canonical_fragmentIdentifier'] || "";
+          
+                        window.TMSHelper.console("[TMSProcessing.getPageURLCanonical] -> info: TMSCache URL parts applied as reference");
+                    } else if (canonicalTagUrl !== "") {
+                        // 2.1.2 use vars from canonical tag as reference
+                        var mergeObject = window.TMSHelper.URLslasher(canonicalTagUrl);
+          
+                        window.TMSHelper.console("[TMSProcessing.getPageURLCanonical] -> info: Canonical Tag URL parts applied as reference");
+                    } else if (
+                           (typeof window.TMSEvent['page_url_window_protocol'] === "string"             && window.TMSEvent['page_url_window_protocol'] !== "")
+                        || (typeof window.TMSEvent['page_url_window_hostname'] === "string"             && window.TMSEvent['page_url_window_hostname'] != "")
+                        || (typeof window.TMSEvent['page_url_window_path'] === "string"                 && window.TMSEvent['page_url_window_path'] !== "")
+                        || (typeof window.TMSEvent['page_url_window_queryString'] === "string"          && window.TMSEvent['page_url_window_queryString'] !== "")
+                        || (typeof window.TMSEvent['page_url_window_fragmentIdentifier'] === "string"   && window.TMSEvent['page_url_window_fragmentIdentifier'] !== "")
+                        ) {
+                        // 2.1.3 use vars from window URL as reference
+                        var mergeObject = [];
+                        mergeObject['protocol'] = window.TMSEvent['page_url_window_protocol'] || "";
+                        mergeObject['hostname'] = window.TMSEvent['page_url_window_hostname'] || "";
+                        mergeObject['path'] = window.TMSEvent['page_url_window_path'] || "";
+                        mergeObject['queryString'] = window.TMSEvent['page_url_window_queryString'] || "";
+                        mergeObject['fragmentIdentifier'] = window.TMSEvent['page_url_window_fragmentIdentifier'] || "";
+          
+                        window.TMSHelper.console("[TMSProcessing.getPageURLCanonical] -> info: Window URL parts from TMSEvent applied as reference");
+                    } else {
+                        var mergeObject = [];
+          
+                        window.TMSHelper.console("[TMSProcessing.getPageURLCanonical] -> warning: No reference to apply on URL parts found");
+                    }
+          
+                    var canonicalUrlConstructed = "";
+          
+                    // 2.2 loop through canonical URL parts
+                    for (i = 0; i < reverseOrderedAttributes.length; i++) {
+                        if (typeof window.TMSEvent['page_url_canonical_' + reverseOrderedAttributes[i]] === "string" && window.TMSEvent['page_url_canonical_' + reverseOrderedAttributes[i]] !== "") {
+                            if (reverseOrderedAttributes[i] === "protocol") {
+                                canonicalUrlConstructed = window.TMSEvent['page_url_canonical_' + reverseOrderedAttributes[i]] + "//" + canonicalUrlConstructed;
+                            } else if (reverseOrderedAttributes[i] === "queryString") {
+                                canonicalUrlConstructed = "?" + window.TMSEvent['page_url_canonical_' + reverseOrderedAttributes[i]] + canonicalUrlConstructed;
+                            } else if (reverseOrderedAttributes[i] === "fragmentIdentifier") {
+                                canonicalUrlConstructed = "#" + window.TMSEvent['page_url_canonical_' + reverseOrderedAttributes[i]] + canonicalUrlConstructed;
+                            } else {
+                                canonicalUrlConstructed = window.TMSEvent['page_url_canonical_' + reverseOrderedAttributes[i]] + canonicalUrlConstructed;
+                            }
+                        } else {                      
+                            if (typeof mergeObject[reverseOrderedAttributes[i]] === "string" && mergeObject[reverseOrderedAttributes[i]] !== "") {
+                                if (reverseOrderedAttributes[i] === "protocol") {
+                                    canonicalUrlConstructed = mergeObject[reverseOrderedAttributes[i]] + "//" + canonicalUrlConstructed;
+                                } else if (reverseOrderedAttributes[i] === "queryString") {
+                                    canonicalUrlConstructed = "?" + mergeObject[reverseOrderedAttributes[i]] + canonicalUrlConstructed;
+                                } else if (reverseOrderedAttributes[i] === "fragmentIdentifier") {
+                                    canonicalUrlConstructed = "#" + mergeObject[reverseOrderedAttributes[i]] + canonicalUrlConstructed;
+                                } else {
+                                    canonicalUrlConstructed = mergeObject[reverseOrderedAttributes[i]] + canonicalUrlConstructed;
+                                }
+                            }
+                        }
+                    }
+          
+                    // 2.3 slash consctructed canonical URL
+                    var canonicalUrlConstructedSlashed = window.TMSHelper.URLslasher(canonicalUrlConstructed);
+              
+                    // 2.4 copy to TMSEvent
+                    window.TMSEvent = window.TMSHelper.copyVarsFromObjectToObject({
+                              sourceObject: canonicalUrlConstructedSlashed
+                            , mergeObject: window.TMSEvent
+                            , targetPrefix: "page_url_canonical_"
+                            , overwrite: true
+                            , harmonize: false
+                            , includeFromSource: {}
+                            , excludeFromSource: {}
+                            , includeFromMerge: {}
+                            , excludeFromMerge: {}
+                            , flatten: false
+                        });
+          
+                    // 2.5 set processing flag
+                    processingFlag = true;
+                } else {
+                    window.TMSHelper.console("[TMSProcessing.getPageURLCanonical] -> info: TMSEvent does not contain URL parts, checking for TMSCache next");
+                          
+                    // do not set processing flag
+                    processingFlag = false;
+                }
+            } // end if
+     
+            if (!processingFlag && typeof TMSCache === "object") {
+                // 3 nothing found in TMSEvent so far, check TMSCache
+                if (
+                       (typeof window.TMSCache['page_url_canonical_url'] === "string"                  && window.TMSCache['page_url_canonical_url'] !== "")
+                    || (typeof window.TMSCache['page_url_canonical_protocol'] === "string"             && window.TMSCache['page_url_canonical_protocol'] !== "")
+                    || (typeof window.TMSCache['page_url_canonical_hostname'] === "string"             && window.TMSCache['page_url_canonical_hostname'] != "")
+                    || (typeof window.TMSCache['page_url_canonical_path'] === "string"                 && window.TMSCache['page_url_canonical_path'] !== "")
+                    || (typeof window.TMSCache['page_url_canonical_queryString'] === "string"          && window.TMSCache['page_url_canonical_queryString'] !== "")
+                    || (typeof window.TMSCache['page_url_canonical_fragmentIdentifier'] === "string"   && window.TMSCache['page_url_canonical_fragmentIdentifier'] !== "")
+                    ) {
+                    // 3.1 URL found in TMSCache
+                    window.TMSEvent['page_url_canonical_url']                = window.TMSCache['page_url_canonical_url'] || "";
+                    window.TMSEvent['page_url_canonical_protocol']           = window.TMSCache['page_url_canonical_protocol'] || "";
+                    window.TMSEvent['page_url_canonical_hostname']           = window.TMSCache['page_url_canonical_hostname'] || "";
+                    window.TMSEvent['page_url_canonical_path']               = window.TMSCache['page_url_canonical_path'] || "";
+                    window.TMSEvent['page_url_canonical_queryString']        = window.TMSCache['page_url_canonical_queryString'] || "";
+                    window.TMSEvent['page_url_canonical_fragmentIdentifier'] = window.TMSCache['page_url_canonical_fragmentIdentifier'] || "";
+              
+                    window.TMSHelper.console("[TMSProcessing.getPageURLCanonical] -> info: TMSCache contains URL parts, copied to TMSEvent");
+              
+                    // 3.2 set processing flag
+                    processingFlag = true;
+                } else {
+                    window.TMSHelper.console("[TMSProcessing.getPageURLCanonical] -> info: TMSCache not contain URL parts, checking for Canonical Tag next");
+                              
+                    // do not set processing flag
+                    processingFlag = false;
+                }
+            } else {
+                window.TMSHelper.console("[TMSProcessing.getPageURLCanonical] warning -> TMSCache is not defined");
+            } // end if TMSCache
+              
+            if (!processingFlag) {
+                // 4 nothing found in TMSEvent or TMSCache, check Canonical Tag
+                var canonicalTagUrl = window.TMSHelper.getURLFromHtmlElement("canonical", null);
+              
+                if (canonicalTagUrl !== "") {
+                    // 4.1 slash
+                    var canonicalTagUrlSlashed = window.TMSHelper.URLslasher(window.TMSHelper.URLconstructor(canonicalTagUrl));
+              
+                    // 4.2 copy to TMSEvent
+                    window.TMSEvent = window.TMSHelper.copyVarsFromObjectToObject({
+                              sourceObject: canonicalTagUrlSlashed
+                            , mergeObject: window.TMSEvent
+                            , targetPrefix: "page_url_canonical_"
+                            , overwrite: true
+                            , harmonize: false
+                            , includeFromSource: {}
+                            , excludeFromSource: {}
+                            , includeFromMerge: {}
+                            , excludeFromMerge: {}
+                            , flatten: false
+                        });
+              
+                    window.TMSHelper.console("[TMSProcessing.getPageURLCanonical] -> info: Canonical Tag found, copied to TMSEvent");
+                } else {
+                    // 5 use window URL from TMSEvent as fallback
+                    window.TMSEvent['page_url_canonical_url']                = window.TMSEvent['page_url_window_url'] || "";
+                    window.TMSEvent['page_url_canonical_protocol']           = window.TMSEvent['page_url_window_protocol'] || "";
+                    window.TMSEvent['page_url_canonical_hostname']           = window.TMSEvent['page_url_window_hostname'] || "";
+                    window.TMSEvent['page_url_canonical_path']               = window.TMSEvent['page_url_window_path'] || "";
+                    window.TMSEvent['page_url_canonical_queryString']        = window.TMSEvent['page_url_window_queryString'] || "";
+                    window.TMSEvent['page_url_canonical_fragmentIdentifier'] = window.TMSEvent['page_url_window_fragmentIdentifier'] || "";
+              
+                    window.TMSHelper.console("[TMSProcessing.getPageURLCanonical] -> info: No Canonical information found, copied Window URL from TMSEvent");
+                }
+            } // end if
+ 
+            // concat hostname and path
+            if (typeof window.TMSEvent['page_url_canonical_hostname'] === "string" && typeof window.TMSEvent['page_url_canonical_path'] === "string") {
+                if (window.TMSEvent['page_url_canonical_path'].startsWith("/")) {
+                    window.TMSEvent['page_url_canonical_hostnameAndPath'] = window.TMSEvent['page_url_canonical_hostname'].concat(window.TMSEvent['page_url_canonical_path']);
+                } else {
+                    window.TMSEvent['page_url_canonical_hostnameAndPath'] = window.TMSEvent['page_url_canonical_hostname'].concat("/");
+                    window.TMSEvent['page_url_canonical_hostnameAndPath'] = window.TMSEvent['page_url_canonical_hostnameAndPath'].concat(window.TMSEvent['page_url_canonical_path']);
+                }
+            }
+          
+        } else {
+            window.TMSHelper.console("[TMSProcessing.getPageURLCanonical] warning -> TMSEvent is not defined");
+        } // end if TMSEvent
+          
+        window.TMSHelper.console("[TMSProcessing.getPageURLCanonical] complete");
+    } catch (err) {
+        window.TMSHelper.console("[TMSProcessing.getPageURLCanonical] error:");
+        window.TMSHelper.errorHandler(err);
+    };
+};
+
+// +++++++++++++++++++++++++++++++++++++++++++++++++++++++
+// 1103 TMSProcessing.getPageURLAlternate
+// Issued by: Agnosticalyze
+// version: 1.3.1, 2021-12-17
+// +++++++++++++++++++++++++++++++++++++++++++++++++++++++
+   
+// Get alternate URL
+window.TMSProcessing = window.TMSProcessing || {}; // remove this line if function is included inside a collection wrapper
+window.TMSProcessing.getPageURLAlternate = function () { // remove this line for including function inside a collection wrapper
+// function getPageURLAlternate() {  // uncomment this line for including function inside a collection wrapper
+    try {
+		window.TMSHelper.console("[TMSProcessing.getPageURLAlternate] start");
+   
+		if (typeof window.TMSEvent === "object") {
+			// create processing flag
+			var processingFlag = false;
+   
+			if (typeof window.TMSEvent['page_url_alternate_url'] === "string" && window.TMSEvent['page_url_alternate_url'] !== "") {
+				// 1 alternate URL is already defined in TMSEvent
+				window.TMSHelper.console("[TMSProcessing.getPageURLAlternate] -> info: alternate URL found in TMSEvent");
+   
+				// 1.1 check if URL is valid and complete
+				var startWithProtocol = new RegExp("^[a-zA-Z]*:");
+				if (startWithProtocol.test(window.TMSEvent['page_url_alternate_url'])) {
+					// 1.1.1 slash TMSEvent full URL into temporary URL variables
+					var slashedUrl = window.TMSHelper.URLslasher(window.TMSEvent['page_url_alternate_url']);
+   
+					// 1.1.2 copy to TMSEvent
+					window.TMSEvent = window.TMSHelper.copyVarsFromObjectToObject({
+							  sourceObject: slashedUrl
+							, mergeObject: window.TMSEvent
+							, targetPrefix: "page_url_alternate_"
+							, overwrite: true
+							, harmonize: false
+							, includeFromSource: {}
+							, excludeFromSource: {}
+							, includeFromMerge: {}	
+							, excludeFromMerge: {}
+							, flatten: false
+						});
+   
+					// 1.1.3 set processing flag
+					processingFlag = true;
+				} else {
+					window.TMSHelper.console("[TMSProcessing.getPageURLAlternate] -> warning: TMSEvent[page_url_alternate_url] does not seem to be a valid absolute URL, checking for URL parts in TMSEvent next");
+   
+					// do not set processing flag
+					processingFlag = false;
+				}
+			} else {
+				window.TMSHelper.console("[TMSProcessing.getPageURLAlternate] -> info: TMSEvent[page_url_alternate_url] not found, checking for URL parts in TMSEvent next");
+   
+				// do not set processing flag
+				processingFlag = false;
+			}
+   
+			if (!processingFlag) {
+				// get URL of alternate tag
+				var alternateTagUrlObject = window.TMSHelper.getURLFromHtmlElement("alternate", null);
+				if (typeof alternateTagUrlObject === "object") {
+					var alternateTagUrl = alternateTagUrlObject['url'] || "";
+					var alternateTagLang = alternateTagUrlObject['lang'] || "";
+				} else {
+					var alternateTagUrl = "";
+					var alternateTagLang = "";
+				}
+   
+				if (typeof window.TMSEvent['page_url_alternate_language'] === "string" && window.TMSEvent['page_url_alternate_language'] !== "" && (
+					   (typeof window.TMSEvent['page_url_alternate_protocol'] === "string" && window.TMSEvent['page_url_alternate_protocol'] !== "")
+					|| (typeof window.TMSEvent['page_url_alternate_hostname'] === "string" && window.TMSEvent['page_url_alternate_hostname'] != "")
+					|| (typeof window.TMSEvent['page_url_alternate_path'] === "string" && window.TMSEvent['page_url_alternate_path'] !== "")
+					|| (typeof window.TMSEvent['page_url_alternate_queryString'] === "string" && window.TMSEvent['page_url_alternate_queryString'] !== "")
+					|| (typeof window.TMSEvent['page_url_alternate_fragmentIdentifier'] === "string" && window.TMSEvent['page_url_alternate_fragmentIdentifier'] !== "")
+				)) {
+					// 2 alternate URL parts are already defined in TMSEvent
+					window.TMSHelper.console("[TMSProcessing.getPageURLAlternate] -> info: (at least one) alternate URL Part found in TMSEvent");
+					var reverseOrderedAttributes = ["fragmentIdentifier", "queryString", "path", "hostname", "protocol"];
+   
+					// 2.1 get URL to merge with, either from TMSCache, alternate tag or TMSEvent
+					if (window.TMSEvent['page_url_alternate_language'] === window.TMSCache['page_url_alternate_language'] && (
+						   (typeof window.TMSCache['page_url_alternate_protocol'] === "string" && window.TMSCache['page_url_alternate_protocol'] !== "")
+						|| (typeof window.TMSCache['page_url_alternate_hostname'] === "string" && window.TMSCache['page_url_alternate_hostname'] != "")
+						|| (typeof window.TMSCache['page_url_alternate_path'] === "string" && window.TMSCache['page_url_alternate_path'] !== "")
+						|| (typeof window.TMSCache['page_url_alternate_queryString'] === "string" && window.TMSCache['page_url_alternate_queryString'] !== "")
+						|| (typeof window.TMSCache['page_url_alternate_fragmentIdentifier'] === "string" && window.TMSCache['page_url_alternate_fragmentIdentifier'] !== "")
+					)) {
+						// 2.1.1 use vars from TMSCache as reference
+						var mergeObject = [];
+						mergeObject['protocol'] = window.TMSCache['page_url_alternate_protocol'] || "";
+						mergeObject['hostname'] = window.TMSCache['page_url_alternate_hostname'] || "";
+						mergeObject['path'] = window.TMSCache['page_url_alternate_path'] || "";
+						mergeObject['queryString'] = window.TMSCache['page_url_alternate_queryString'] || "";
+						mergeObject['fragmentIdentifier'] = window.TMSCache['page_url_alternate_fragmentIdentifier'] || "";
+   
+						window.TMSHelper.console("[TMSProcessing.getPageURLAlternate] -> info: TMSCache URL parts applied as reference");
+					} else if (alternateTagUrl !== "" && window.TMSEvent['page_url_alternate_language'] === alternateTagLang) {
+						// 2.1.2 use vars from alternate tag as reference
+						var mergeObject = window.TMSHelper.URLslasher(alternateTagUrl);
+   
+						window.TMSHelper.console("[TMSProcessing.getPageURLAlternate] -> info: alternate Tag URL parts applied as reference");
+					} else {
+						var mergeObject = [];
+   
+						window.TMSHelper.console("[TMSProcessing.getPageURLAlternate] -> warning: No reference to apply on URL parts found");
+					}
+   
+					var alternateUrlConstructed = "";
+   
+					// 2.2 loop through alternate URL parts
+					for (i = 0; i < reverseOrderedAttributes.length; i++) {
+						if (typeof window.TMSEvent['page_url_alternate_' + reverseOrderedAttributes[i]] === "string" && window.TMSEvent['page_url_alternate_' + reverseOrderedAttributes[i]] !== "") {
+							if (reverseOrderedAttributes[i] === "protocol") {
+								alternateUrlConstructed = window.TMSEvent['page_url_alternate_' + reverseOrderedAttributes[i]] + "//" + alternateUrlConstructed;
+							} else if (reverseOrderedAttributes[i] === "queryString") {
+								alternateUrlConstructed = "?" + window.TMSEvent['page_url_alternate_' + reverseOrderedAttributes[i]] + alternateUrlConstructed;
+							} else if (reverseOrderedAttributes[i] === "fragmentIdentifier") {
+								alternateUrlConstructed = "#" + window.TMSEvent['page_url_alternate_' + reverseOrderedAttributes[i]] + alternateUrlConstructed;
+							} else {
+								alternateUrlConstructed = window.TMSEvent['page_url_alternate_' + reverseOrderedAttributes[i]] + alternateUrlConstructed;
+							}
+						} else {
+							if (typeof mergeObject[reverseOrderedAttributes[i]] === "string" && mergeObject[reverseOrderedAttributes[i]] !== "") {
+								if (reverseOrderedAttributes[i] === "protocol") {
+									alternateUrlConstructed = mergeObject[reverseOrderedAttributes[i]] + "//" + alternateUrlConstructed;
+								} else if (reverseOrderedAttributes[i] === "queryString") {
+									alternateUrlConstructed = "?" + mergeObject[reverseOrderedAttributes[i]] + alternateUrlConstructed;
+								} else if (reverseOrderedAttributes[i] === "fragmentIdentifier") {
+									alternateUrlConstructed = "#" + mergeObject[reverseOrderedAttributes[i]] + alternateUrlConstructed;
+								} else {
+									alternateUrlConstructed = mergeObject[reverseOrderedAttributes[i]] + alternateUrlConstructed;
+								}
+							}
+						}
+					}
+   
+					// 2.3 slash consctructed alternate URL
+					var alternateUrlConstructedSlashed = window.TMSHelper.URLslasher(alternateUrlConstructed);
+   
+					// 2.4 copy to TMSEvent
+					window.TMSEvent = window.TMSHelper.copyVarsFromObjectToObject({
+							  sourceObject: alternateUrlConstructedSlashed
+							, mergeObject: window.TMSEvent
+							, targetPrefix: "page_url_alternate_"
+							, overwrite: true
+							, harmonize: false
+							, includeFromSource: {}
+							, excludeFromSource: {}
+							, includeFromMerge: {}
+							, excludeFromMerge: {}
+							, flatten: false
+						});
+   
+					// 2.5 set processing flag
+					processingFlag = true;
+				} else {
+					window.TMSHelper.console("[TMSProcessing.getPageURLAlternate] -> info: TMSEvent does not contain URL parts/language, checking for TMSCache next");
+   
+					// do not set processing flag
+					processingFlag = false;
+				}
+			}
+   
+			if (!processingFlag && typeof TMSCache === "object") {
+				// 3 nothing found in TMSEvent so far, check TMSCache
+				if (typeof window.TMSCache['page_url_alternate_language'] === "string" && window.TMSCache['page_url_alternate_language'] !== "" && (
+					   (typeof window.TMSCache['page_url_alternate_url'] === "string" && window.TMSCache['page_url_alternate_url'] !== "")
+					|| (typeof window.TMSCache['page_url_alternate_protocol'] === "string" && window.TMSCache['page_url_alternate_protocol'] !== "")
+					|| (typeof window.TMSCache['page_url_alternate_hostname'] === "string" && window.TMSCache['page_url_alternate_hostname'] != "")
+					|| (typeof window.TMSCache['page_url_alternate_path'] === "string" && window.TMSCache['page_url_alternate_path'] !== "")
+					|| (typeof window.TMSCache['page_url_alternate_queryString'] === "string" && window.TMSCache['page_url_alternate_queryString'] !== "")
+					|| (typeof window.TMSCache['page_url_alternate_fragmentIdentifier'] === "string" && window.TMSCache['page_url_alternate_fragmentIdentifier'] !== "")
+				)) {
+					// 3.1 URL found in TMSCache
+					window.TMSEvent['page_url_alternate_language'] = window.TMSCache['page_url_alternate_language'] || "";
+					window.TMSEvent['page_url_alternate_url'] = window.TMSCache['page_url_alternate_url'] || "";
+					window.TMSEvent['page_url_alternate_protocol'] = window.TMSCache['page_url_alternate_protocol'] || "";
+					window.TMSEvent['page_url_alternate_hostname'] = window.TMSCache['page_url_alternate_hostname'] || "";
+					window.TMSEvent['page_url_alternate_path'] = window.TMSCache['page_url_alternate_path'] || "";
+					window.TMSEvent['page_url_alternate_queryString'] = window.TMSCache['page_url_alternate_queryString'] || "";
+					window.TMSEvent['page_url_alternate_fragmentIdentifier'] = window.TMSCache['page_url_alternate_fragmentIdentifier'] || "";
+   
+					window.TMSHelper.console("[TMSProcessing.getPageURLAlternate] -> info: TMSCache contains URL parts, copied to TMSEvent");
+   
+					// 3.2 set processing flag
+					processingFlag = true;
+				} else {
+					window.TMSHelper.console("[TMSProcessing.getPageURLAlternate] -> info: TMSCache not contain URL parts, checking for alternate Tag next");
+   
+					// do not set processing flag
+					processingFlag = false;
+				}
+			} // end if TMSCache
+   
+			if (!processingFlag) {
+				// 4 nothing found in TMSEvent or TMSCache, check alternate Tag
+				var alternateTagUrlObject = window.TMSHelper.getURLFromHtmlElement("alternate", null);
+				if (typeof alternateTagUrlObject === "object") {
+					var alternateTagUrl = alternateTagUrlObject['url'] || "";
+					var alternateTagLang = alternateTagUrlObject['lang'] || "";
+				} else {
+					var alternateTagUrl = "";
+					var alternateTagLang = "";
+				}
+   
+				if (alternateTagUrl !== "") {
+					// 4.1 slash
+					var alternateTagUrlSlashed = window.TMSHelper.URLslasher(window.TMSHelper.URLconstructor(alternateTagUrl));
+   
+					// 4.2 copy to TMSEvent
+					window.TMSEvent = window.TMSHelper.copyVarsFromObjectToObject({
+							  sourceObject: alternateTagUrlSlashed
+							, mergeObject: window.TMSEvent
+							, targetPrefix: "page_url_alternate_"
+							, overwrite: true
+							, harmonize: false
+							, includeFromSource: {}
+							, excludeFromSource: {}
+							, includeFromMerge: {}
+							, excludeFromMerge: {}
+							, flatten: false
+						});
+					window.TMSEvent['page_url_alternate_language'] = alternateTagLang;
+   
+					window.TMSHelper.console("[TMSProcessing.getPageURLAlternate] -> info: alternate Tag found, copied to TMSEvent");
+				} else {
+					// 5 leave empty if no information was found anywhere
+					window.TMSEvent['page_url_alternate_language'] = "";
+					window.TMSEvent['page_url_alternate_url'] = "";
+					window.TMSEvent['page_url_alternate_protocol'] = "";
+					window.TMSEvent['page_url_alternate_hostname'] = "";
+					window.TMSEvent['page_url_alternate_path'] = "";
+					window.TMSEvent['page_url_alternate_queryString'] = "";
+					window.TMSEvent['page_url_alternate_fragmentIdentifier'] = "";
+   
+					window.TMSHelper.console("[TMSProcessing.getPageURLAlternate] -> info: No alternate information found, Alternate URL left empty in TMSEvent");
+				}
+			} // end if
+ 
+			// concat hostname and path
+			if (typeof window.TMSEvent['page_url_alternate_hostname'] === "string" && typeof window.TMSEvent['page_url_alternate_path'] === "string") {
+				if (window.TMSEvent['page_url_alternate_hostname'] !== "") {
+					// alternate hostname is populated
+					if (window.TMSEvent['page_url_alternate_path'].startsWith("/")) {
+						// alternate path is populated and starts with slash/
+						window.TMSEvent['page_url_alternate_hostnameAndPath'] = window.TMSEvent['page_url_alternate_hostname'].concat(window.TMSEvent['page_url_alternate_path']);
+					} else {
+						// alternate path is either empty or populated and doesnt start with slash
+						window.TMSEvent['page_url_alternate_hostnameAndPath'] = window.TMSEvent['page_url_alternate_hostname'].concat("/");
+						window.TMSEvent['page_url_alternate_hostnameAndPath'] = window.TMSEvent['page_url_alternate_hostnameAndPath'].concat(window.TMSEvent['page_url_alternate_path']);
+					}
+				} else {
+					// alternate hostname is not populated
+					window.TMSEvent['page_url_alternate_hostnameAndPath'] = "";
+				}
+			}
+ 
+		} else {
+			window.TMSHelper.console("[TMSProcessing.getPageURLAlternate] warning -> TMSEvent is not defined");
+		} // end if TMSEvent
+   
+		window.TMSHelper.console("[TMSProcessing.getPageURLAlternate] complete");
+	} catch (err) {
+		window.TMSHelper.console("[TMSProcessing.getPageURLAlternate] error:");
+		window.TMSHelper.errorHandler(err);
+	};
+};
+
+// +++++++++++++++++++++++++++++++++++++++++++++++++++++++
+// 1104 TMSProcessing.getPageURLInput
+// Issued by: Agnosticalyze
+// version: 1.4.1, 2021-02-19
+// +++++++++++++++++++++++++++++++++++++++++++++++++++++++
+  
+// Get input URL
+window.TMSProcessing = window.TMSProcessing || {}; // remove this line if function is included inside a collection wrapper
+window.TMSProcessing.getPageURLInput = function () { // remove this line for including function inside a collection wrapper
+// function getPageURLInput() {  // uncomment this line for including function inside a collection wrapper
+    try {
+        window.TMSHelper.console("[TMSProcessing.getPageURLInput] start");
+              
+        if(typeof window.TMSEvent === "object") {
+            // create processing flag
+            var processingFlag = false;
+ 
+            if (typeof window.TMSEvent['page_url_input_url'] === "string" && window.TMSEvent['page_url_input_url'] !== "") {
+                // 1 input URL is already defined in TMSEvent
+                window.TMSHelper.console("[TMSProcessing.getPageURLInput] -> info: Input URL found in TMSEvent: " + window.TMSEvent['page_url_input_url']);
+ 
+                // set processing flag
+                processingFlag = true;
+            } else {
+                window.TMSHelper.console("[TMSProcessing.getPageURLInput] -> info: Input URL not found in TMSEvent, checking window query string next");
+ 
+                // do not set processing flag
+                processingFlag = false;
+            }
+ 
+            if (!processingFlag && typeof window.TMSEvent['page_url_window_queryString'] === "string" && window.TMSEvent['page_url_window_queryString'] !== "") {
+                var inputUrl = window.TMSHelper.getVarFromString(window.TMSEvent['page_url_window_queryString'], "page_url_input_url", "url");
+                if (typeof inputUrl === "string" && inputUrl !== "") {
+                    // 2 input URL found in window query string
+                    window.TMSEvent['page_url_input_url'] = inputUrl;
+                    window.TMSHelper.console("[TMSProcessing.getPageURLInput] -> info: Input URL found in window query string in TMSEvent: " + inputUrl);
+ 
+                    // set processing flag
+                    processingFlag = true;
+                } else {
+                    window.TMSHelper.console("[TMSProcessing.getPageURLInput] -> info: Input URL not found in window query string in TMSEvent, checking TMSCache next");
+ 
+                    // do not set processing flag
+                    processingFlag = false;
+                }
+            } else {
+                window.TMSHelper.console("[TMSProcessing.getPageURLInput] -> info: window query string not found in TMSEvent, checking TMSCache next");
+ 
+                // do not set processing flag
+                processingFlag = false;
+            }
+ 
+            if (!processingFlag && typeof TMSCache === "object") {
+                if (typeof window.TMSCache['page_url_input_url'] === "string" && window.TMSCache['page_url_input_url'] !== "") {
+                    // 3 input URL found in TMSCache
+                    window.TMSEvent['page_url_input_url'] = window.TMSCache['page_url_input_url'];
+                    window.TMSHelper.console("[TMSProcessing.getPageURLInput] -> info: Input URL found in TMSCache: " + window.TMSCache['page_url_input_url']);
+ 
+                    // set processing flag
+                    processingFlag = true;
+                } else {
+                    window.TMSHelper.console("[TMSProcessing.getPageURLInput] -> info: Input URL not found in TMSCache, trying to set to Window URL in TMSEvent next");
+ 
+                    // do not set processing flag
+                    processingFlag = false;
+                }
+            } else {
+                window.TMSHelper.console("[TMSProcessing.getPageURLInput] warning -> TMSCache is not defined");
+            }
+ 
+            if (!processingFlag && typeof window.TMSEvent['page_url_window_url'] === "string" && window.TMSEvent['page_url_window_url'] !== "") {
+                // 4 input URL not found => set to window URL
+                window.TMSEvent['page_url_input_url'] = window.TMSEvent['page_url_window_url'];
+                window.TMSHelper.console("[TMSProcessing.getPageURLInput] -> info: Input URL not found, set Input URL to Window URL: " + window.TMSEvent['page_url_window_url']);
+ 
+                // set processing flag
+                processingFlag = true;
+            } else {
+                window.TMSHelper.console("[TMSProcessing.getPageURLInput] -> warning: Window URL not found in TMSEvent");
+ 
+                // do not set processing flag
+                processingFlag = false;
+            }
+ 
+            if (!processingFlag) {
+                window.TMSEvent['page_url_input_url'] = undefined;
+                window.TMSEvent['page_url_input_differentFromWindow'] = undefined;
+ 
+                window.TMSHelper.console("[TMSProcessing.getPageURLInput] -> info: Input and Window URL not found, Input URL remains undefined");
+            } else {
+                // set flag variable to easily identify Input URLs that differ from Window URLs
+                if (typeof window.TMSEvent['page_url_input_url'] === "string" && window.TMSEvent['page_url_input_url'] !== "" && typeof window.TMSEvent['page_url_window_url'] === "string" && window.TMSEvent['page_url_window_url'] !== "") {
+                    if (window.TMSEvent['page_url_input_url'] === window.TMSEvent['page_url_window_url']) {
+                        window.TMSEvent['page_url_input_differentFromWindow'] = false;
+                        window.TMSHelper.console("[TMSProcessing.getPageURLInput] -> info: Input and Window URL are equal");
+                    } else {
+                        window.TMSEvent['page_url_input_differentFromWindow'] = true;
+                        window.TMSHelper.console("[TMSProcessing.getPageURLInput] -> info: Input and Window URL are different");
+                    }
+                } else {
+                    window.TMSEvent['page_url_input_differentFromWindow'] = undefined;
+                }
+            }
+  
+        } else {
+            window.TMSHelper.console("[TMSProcessing.getPageURLInput] warning -> TMSEvent is not defined");
+        }
+              
+        window.TMSHelper.console("[TMSProcessing.getPageURLInput] complete");
+    } catch (err) {
+        window.TMSHelper.console("[TMSProcessing.getPageURLInput] error:");
+        window.TMSHelper.errorHandler(err);
+    };
+};
+
+// +++++++++++++++++++++++++++++++++++++++++++++++++++++++
+// 1105 TMSProcessing.getCurrentPageName
+// Issued by: Agnosticalyze
+// version: 1.0, 2021-09-15
+// +++++++++++++++++++++++++++++++++++++++++++++++++++++++
+   
+window.TMSProcessing = window.TMSProcessing || {}; // remove this line if function is included inside a collection wrapper
+window.TMSProcessing.getCurrentPageName = function () { // remove this line for including function inside a collection wrapper
+// function getCurrentPageName() { // uncomment this line for including function inside a collection wrapper
+  try {
+    if (!window.TMSEvent['page_pageInfo_pageName']) window.TMSEvent['page_pageInfo_pageName'] =  document.title;
+  } catch (err) {
+    window.TMSHelper.console("[TMSProcessing.getCurrentPageName] error:");
+    window.TMSHelper.errorHandler(err);
+    return '';
+  };
+};
+
+// +++++++++++++++++++++++++++++++++++++++++++++++++++++++
+// 1111 TMSProcessing.getCurrentTouchpoint
+// Issued by: Agnosticalyze
+// version: 1.11, 2022-03-04
+// +++++++++++++++++++++++++++++++++++++++++++++++++++++++
+   
+// Get current touchpoint from URL query parameter on physical pageview
+window.TMSProcessing = window.TMSProcessing || {}; // remove this line if function is included inside a collection wrapper
+window.TMSProcessing.getCurrentTouchpoint = function () { // remove this line for including function inside a collection wrapper
+// function getCurrentTouchpoint() { // uncomment this line for including function inside a collection wrapper
+    try {
+        window.TMSHelper.console("[TMSProcessing.getCurrentTouchpoint] start");
+  
+        var config = window.TMSConfig['tmsConfig_processing_touchpointDelimiters'];
+        if (config == undefined) {
+            config = {
+                prefix: "::",
+                component: ";;",
+                value: '~'
+            }
+        }
+        var pv_delim = config.prefix;
+        var c_delim = config.component;
+        var v_delim = config.value;
+                 
+        if (typeof window.TMSEvent === "object" && typeof window.TMSConfig === "object") {
+            if (typeof window.TMSEvent['touchpoint_point_current_touchpointInfo_id'] !== "undefined" && window.TMSEvent['touchpoint_point_current_touchpointInfo_id'] !== "") {
+                window.TMSHelper.console("[TMSProcessing.getCurrentTouchpoint] -> warning: current touchpoint is already defined, but it should not be");
+            } else if (typeof window.TMSConfig['tmsConfig_processing_touchpointAttributes'] === "object" && typeof window.TMSConfig['tmsConfig_processing_touchpointParameters'] === "object" && typeof window.TMSConfig['tmsConfig_processing_touchpointDelimiters'] === "object") {
+                loopAttributes: for (var i = 0; i < window.TMSConfig['tmsConfig_processing_touchpointAttributes'].length; i++) {
+                    if (typeof window.TMSEvent[window.TMSConfig['tmsConfig_processing_touchpointAttributes'][i]] === "string" && window.TMSEvent[window.TMSConfig['tmsConfig_processing_touchpointAttributes'][i]] !== "") {
+                        var currAttributeValue = window.TMSEvent[window.TMSConfig['tmsConfig_processing_touchpointAttributes'][i]];
+                        // remove other attributes (and therefore their parameters) from current attribute to ensure hierarchy
+                        // note: assumes other attributes might be in decoded or encoded variant
+                        window.TMSHelper.console("[TMSProcessing.getCurrentTouchpoint] -> info: cleaning attribute " + window.TMSConfig['tmsConfig_processing_touchpointAttributes'][i] + " from nested attributes for touchpoint scanning");
+                        loopCleanAttributes: for (var j = 0; j < window.TMSConfig['tmsConfig_processing_touchpointAttributes'].length; j++) {
+                            var regex = new RegExp(window.TMSConfig['tmsConfig_processing_touchpointAttributes'][j], "gi");
+                            if (regex.test(currAttributeValue)) {
+                                window.TMSHelper.console("[TMSProcessing.getCurrentTouchpoint] -> info: attribute " + window.TMSConfig['tmsConfig_processing_touchpointAttributes'][j] + " found nested inside attribute " + window.TMSConfig['tmsConfig_processing_touchpointAttributes'][i] + " -> removing for touchpoint scanning");
+                                if (window.TMSConfig['tmsConfig_processing_touchpointAttributes'][i] === window.TMSConfig['tmsConfig_processing_touchpointAttributes'][j]) {
+                                    // attributes should not be self-contained. However, remove anyway with warning
+                                    window.TMSHelper.console("[TMSProcessing.getCurrentTouchpoint] -> warning: nested identical attributes should not happen, please verify this is supposed to happen!");
+                                }
+                                var regexDecoded = new RegExp(window.TMSConfig['tmsConfig_processing_touchpointAttributes'][j] + "=", "gi")
+                                if (regexDecoded.test(currAttributeValue)) {
+                                    window.TMSHelper.console("[TMSProcessing.getCurrentTouchpoint] -> warning: attribute " + window.TMSConfig['tmsConfig_processing_touchpointAttributes'][j] + " is nested in decoded form -> removing everything behind its first occurence");
+                                    var matchPos = currAttributeValue.indexOf(window.TMSConfig['tmsConfig_processing_touchpointAttributes'][j] + "=");
+                                    currAttributeValue = currAttributeValue.substr(0, matchPos) + "placeholderAttribute=placeholderValue" + currAttributeValue.substr(matchPos + (window.TMSConfig['tmsConfig_processing_touchpointAttributes'][j] + "=").length)
+                                } else {
+                                    window.TMSHelper.console("[TMSProcessing.getCurrentTouchpoint] -> info: attribute " + window.TMSConfig['tmsConfig_processing_touchpointAttributes'][j] + " is nested in encoded form");
+                                    var replaceValue = window.TMSHelper.getVarFromString(currAttributeValue, window.TMSConfig['tmsConfig_processing_touchpointAttributes'][j], "url");
+                                    currAttributeValue = currAttributeValue.replace(window.TMSConfig['tmsConfig_processing_touchpointAttributes'][j] + "%3D" + replaceValue, "placeholderAttribute%3DplaceholderValue");
+                                }
+                            } else {
+                                window.TMSHelper.console("[TMSProcessing.getCurrentTouchpoint] -> info: attribute " + window.TMSConfig['tmsConfig_processing_touchpointAttributes'][j] + " not found nested inside attribute " + window.TMSConfig['tmsConfig_processing_touchpointAttributes'][i]);
+                            }
+                        }
+                               
+                        // scan current attribute for relevant parameter value
+                        window.TMSHelper.console("[TMSProcessing.getCurrentTouchpoint] -> info: cleaned attribute " + window.TMSConfig['tmsConfig_processing_touchpointAttributes'][i] + " to be scanned: " + currAttributeValue);
+                        var otherParamValues = [];
+                        loopParameters: for (var j = 0; j < window.TMSConfig['tmsConfig_processing_touchpointParameters'].length; j++) {
+                            var parameter = window.TMSConfig['tmsConfig_processing_touchpointParameters'][j];
+                            var currValue = window.TMSHelper.getVarFromString(currAttributeValue, parameter);
+                            if (typeof currValue === "string" && currValue !== "") {
+                                if (parameter === "sourceid") {
+                                    window.TMSHelper.console("[TMSProcessing.getCurrentTouchpoint] -> info: parameter (sourceid) found in " + window.TMSConfig['tmsConfig_processing_touchpointAttributes'][i]);
+                                    var startWithPrefix = new RegExp("^srcid" + pv_delim + ".*");
+                                    if (!startWithPrefix.test(currValue)) {
+                                        // expected prefix not found -> add prefix
+                                        currValue = "srcid" + pv_delim + currValue;
+                                    }
+                                    // terminal case, stop scanning
+                                    break loopParameters;
+                                } else if (parameter === "WT.mc_id") {
+                                    window.TMSHelper.console("[TMSProcessing.getCurrentTouchpoint] -> info: parameter (WT.mc_id) found in " + window.TMSConfig['tmsConfig_processing_touchpointAttributes'][i]);
+                                    var startWithPrefix = new RegExp("^wtmcid" + pv_delim + ".*");
+                                    if (!startWithPrefix.test(currValue)) {
+                                        // expected prefix not found -> add prefix
+                                        currValue = "wtmcid" + pv_delim + currValue;
+                                    }
+                                    // terminal case, stop scanning
+                                    break loopParameters;
+                                } else if (parameter === "gclid" || parameter.indexOf("utm_") === 0) {
+                                    // any UTM Parameter found -> concatenate all 5
+                                    window.TMSHelper.console("[TMSProcessing.getCurrentTouchpoint] -> info: parameter (UTM) found in " + window.TMSConfig['tmsConfig_processing_touchpointAttributes'][i]);
+                                    var startWithPrefix = new RegExp("^utmid" + pv_delim + ".*");
+                                    if (!startWithPrefix.test(currValue)) {
+                                        // expected prefix not found in first parameter -> add prefix
+                                        var concatValue = "utmid" + pv_delim;
+                                    } else {
+                                        var concatValue = "";
+                                    }
+  
+                                    // get the list of valid utm params(including ga specific gclid) configured in tmsConfig_processing_touchpointParameters
+                                    var utm_params = [];
+                                    for (var p = 0; p < window.TMSConfig['tmsConfig_processing_touchpointParameters'].length; p++) {
+                                      var pp = window.TMSConfig['tmsConfig_processing_touchpointParameters'][p];
+                                      if (pp === "gclid" || pp.indexOf("utm_") === 0) utm_params.push(pp);
+                                    }
+                                    for (var k = 0; k < utm_params.length; k++) {
+                                        utm_params[k] = utm_params[k] + v_delim + (window.TMSHelper.getVarFromString(currAttributeValue, window.TMSConfig['tmsConfig_processing_touchpointParameters'][k]) || "not-set");
+                                    }
+                                    utm_params = utm_params.sort();
+                                    concatValue = utm_params.join(c_delim);
+                                    currValue = "gglid" + pv_delim + concatValue;
+                                      
+                                    // terminal case, stop scanning
+                                    break loopParameters;
+                                } else {
+                                    window.TMSHelper.console("[TMSProcessing.getCurrentTouchpoint] -> Falling back to default parameter logic");
+                                    otherParamValues.push(parameter + "~" + currValue)
+                                }
+                                // Non-terminal case, we want to grab all parameters if no terminal cases hit
+                            } // end if
+                        } // end loopParameters
+                        if (typeof currValue === "string" && currValue.trim() === "" && otherParamValues.length > 0) {
+                            currValue = "other" + pv_delim + otherParamValues.join(c_delim);
+                        }
+                    } // end if
+                    // was a parameter found in the current attribute?
+                    if (typeof currValue === "string" && currValue !== "") {
+                        // parameter found, stop scanning
+                        break loopAttributes;
+                    }
+                } // end loopAttributes
+                               
+                if (typeof currValue === "string" && currValue !== "") {
+                    window.TMSEvent['touchpoint_point_current_touchpointInfo_id'] = currValue;
+                    window.TMSHelper.console("[TMSProcessing.getCurrentTouchpoint] -> info: current touchpoint set to: " + window.TMSEvent['touchpoint_point_current_touchpointInfo_id']);
+                } else {
+                    window.TMSHelper.console("[TMSProcessing.getCurrentTouchpoint] -> info: no parameter found in any checked attribute, current touchpoint remains undefined");
+                }
+            } else {
+                window.TMSHelper.console("[TMSProcessing.getCurrentTouchpoint] -> warning: TMSConfig[tmsConfig_processing_touchpointAttributes] and/or TMSConfig[tmsConfig_processing_touchpointParameters] and/or TMSConfig[tmsConfig_processing_touchpointDelimiters] not defined");
+            }
+        } else {
+            window.TMSHelper.console("[TMSProcessing.getCurrentTouchpoint] -> warning: TMSEvent and/or TMSConfig not defined");
+        }
+                       
+        window.TMSHelper.console("[TMSProcessing.getCurrentTouchpoint] complete");
+    } catch (err) {
+        window.TMSHelper.console("[TMSProcessing.getCurrentTouchpoint] error:");
+        window.TMSHelper.errorHandler(err);
+    };
+};
+
+// +++++++++++++++++++++++++++++++++++++++++++++++++++++++
+// 1112 TMSProcessing.touchpointHandler
+// Issued by: Agnosticalyze
+// version: 1.7.1, 2022-01-11
+// +++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ 
+// touchpointHandler: adds the current touchpoint to the stack of touchpoints
+window.TMSProcessing = window.TMSProcessing || {}; // remove this line if function is included inside a collection wrapper
+window.TMSProcessing.touchpointHandler = function () { // remove this line for including function inside a collection wrapper
+    if (typeof window.TMSEvent !== "undefined" && typeof window.TMSEvent['touchpoint_point_current_touchpointInfo_id'] === "string") {
+        var current = window.TMSEvent['touchpoint_point_current_touchpointInfo_id'];
+
+        // read previous values unless all values have been provided already
+        if (typeof window.TMSEvent['touchpoint_point_first_touchpointInfo_id'] === "string" && typeof window.TMSEvent['touchpoint_path_intermediate_touchpointInfo_id'] === "string" && typeof window.TMSEvent['touchpoint_path_full_touchpointInfo_id'] === "string" && typeof window.TMSEvent['touchpoint_point_latest_touchpointInfo_id'] === "string") {
+            window.TMSHelper.console("[TMSProcessing.touchpointHandler] -> info: touchpoint stack already defined in TMSEvent");
+        } else {
+            // read values from storage
+            var cookieValueOld = window.TMSHelper.readValue("TMSTouchpoints");
+            var allTouchpointsArr       = [];
+            if (typeof cookieValueOld == "string") {
+                allTouchpointsArr = cookieValueOld.split("|");
+            }
+            
+            // add current touchpoint as last one
+            allTouchpointsArr.push(current);
+
+            var allTouchpoints          = allTouchpointsArr.join("|");
+            var firstTouchpoint         = allTouchpointsArr[0];
+            var lastTouchpoint          = allTouchpointsArr[allTouchpointsArr.length - 1];
+            var intermedaiteTouchpoints = allTouchpointsArr.slice(1, allTouchpointsArr.length - 1).join("|");
+  
+            window.TMSEvent['touchpoint_point_first_touchpointInfo_id'] = firstTouchpoint;
+            window.TMSEvent['touchpoint_path_intermediate_touchpointInfo_id'] = intermedaiteTouchpoints;
+            window.TMSEvent['touchpoint_path_full_touchpointInfo_id'] = allTouchpoints;
+            window.TMSEvent['touchpoint_point_latest_touchpointInfo_id'] = lastTouchpoint;
+
+            // save new touchpoint history in storage
+            window.TMSHelper.storeValue("TMSTouchpoints", allTouchpoints, 28);
+  
+            window.TMSHelper.console("[TMSProcessing.touchpointHandler] -> info: touchpoint stack updated");
+        }
+    }
+};
+
+// +++++++++++++++++++++++++++++++++++++++++++++++++++++++
+// 1113 TMSProcessing.mapCurrentTouchpointValues
+// Issued by: Agnosticalyze
+// version: 2.2, 2022-06-21
+// +++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ 
+window.TMSProcessing = window.TMSProcessing || {}; // remove this line if function is included inside a collection wrapper
+window.TMSProcessing.mapCurrentTouchpointValues = function () {
+    // remove this line for including function inside a collection wrapper
+    // function mapCurrentTouchpointValues() { // uncomment this line for including function inside a collection wrapper
+    try {
+        window.TMSHelper.console(
+            "[TMSProcessing.mapCurrentTouchpointValues] start"
+        );
+        var config = window.TMSConfig["tmsConfig_processing_touchpointDelimiters"];
+        if (config == undefined) {
+            config = {
+                prefix: "::",
+                component: ";;",
+                value: "~",
+            };
+        }
+        var pv_delim = config.prefix;
+        var c_delim = config.component;
+        var v_delim = config.value;
+ 
+        if (
+            typeof window.TMSEvent === "object" &&
+            typeof window.TMSConfig === "object"
+        ) {
+            if (
+                typeof window.TMSEvent["touchpoint_point_current_touchpointInfo_id"] ===
+                    "string" &&
+                window.TMSEvent["touchpoint_point_current_touchpointInfo_id"] !== "" &&
+                typeof window.TMSConfig["tmsConfig_processing_touchpointDelimiters"] ===
+                    "object" &&
+                typeof window.TMSConfig["tmsConfig_processing_touchpointComponents"] ===
+                    "object"
+            ) {
+                try {
+                    // check if any considered prefix is present
+                    var startWithPrefix = new RegExp(
+                        "^((src|wtmc|utm|ggl)id|other)" + pv_delim + ".*"
+                    );
+                    if (
+                        startWithPrefix.test(
+                            window.TMSEvent["touchpoint_point_current_touchpointInfo_id"]
+                        )
+                    ) {
+                        var startWithSrcid = new RegExp("^srcid" + pv_delim + ".*", "gi");
+                        var startWithWtmcid = new RegExp("^wtmcid" + pv_delim + ".*", "gi");
+ 
+                        if (
+                            startWithSrcid.test(
+                                window.TMSEvent["touchpoint_point_current_touchpointInfo_id"]
+                            )
+                        ) {
+                            window.TMSHelper.console(
+                                "[TMSProcessing.mapCurrentTouchpointValues] -> info: touchpoint prefix srcid found -> generic mapping"
+                            );
+                            // remove prefix from touchpoint
+                            var touchpoint =
+                                window.TMSEvent[
+                                    "touchpoint_point_current_touchpointInfo_id"
+                                ].split(pv_delim)[1];
+                            if (touchpoint.includes(v_delim)) {
+                                window.TMSHelper.console(
+                                    "[TMSProcessing.mapCurrentTouchpointValues] -> info: touchpoint contains key-value-separators -> continue generic mapping"
+                                );
+                                // split touchpoint components
+                                var touchpointComponentsString = touchpoint
+                                    .split(c_delim)
+                                    .filter(Boolean); // remove empty items
+                                // convert touchpoint components into key-value-pairs
+                                var touchpointComponentsFound = touchpointComponentsString
+                                    .map(function (v) {
+                                        return v.split(v_delim);
+                                    })
+                                    .reduce(function (acc, cur) {
+                                        return (acc[cur[0]] = cur[1]), acc;
+                                    }, {}); // cf. https://stackoverflow.com/questions/57688073/make-array-of-string-as-key-value-pair
+ 
+                                // generic mapping per component
+ 
+                                var touchpointComponents = {};
+                                // var touchpointComponentsLeftovers = touchpointComponentsFound.slice();
+ 
+                                loopComponentsConsidered: for (var i in window.TMSConfig[
+                                    "tmsConfig_processing_touchpointComponents"
+                                ]) {
+                                    if (touchpointComponentsFound.hasOwnProperty(i)) {
+                                        if (!touchpointComponents.hasOwnProperty(i)) {
+                                            touchpointComponents[i] = touchpointComponentsFound[i];
+                                        } // else: component was already added before -> would only happen if the same component appeared twice in TMSConfig.tmsConfig_processing_touchpointComponents
+                                    } else {
+                                        touchpointComponents[i] = "unspecified";
+                                    }
+                                }
+ 
+                                loopComponentsFound: for (var i in touchpointComponentsFound) {
+                                    if (!touchpointComponents.hasOwnProperty(i)) {
+                                        touchpointComponents[i] = touchpointComponentsFound[i];
+                                        // touchpointComponentsLeftovers[i] = undefined;
+                                    } // else: component was already added before
+                                }
+ 
+                                // add the left over components as string to the end of the array of components
+                                // touchpointComponents['other'] = touchpointComponentsLeftovers.filter(Boolean).join("_");
+ 
+                                loopComponents: for (var i in touchpointComponents) {
+                                    // map component to TMSEvent
+                                    if (
+                                        window.TMSEvent.hasOwnProperty(
+                                            window.TMSConfig[
+                                                "tmsConfig_processing_touchpointComponents"
+                                            ][i]
+                                        )
+                                    ) {
+                                        window.TMSHelper.console(
+                                            "[TMSProcessing.mapCurrentTouchpointValues] -> warning: TMSEvent already contains a value for " +
+                                                window.TMSConfig[
+                                                    "tmsConfig_processing_touchpointComponents"
+                                                ][i] +
+                                                " -> not overwritten"
+                                        );
+                                    } else if (
+                                        typeof window.TMSConfig[
+                                            "tmsConfig_processing_touchpointComponents"
+                                        ][i] !== "undefined"
+                                    ) {
+                                        window.TMSEvent[
+                                            window.TMSConfig[
+                                                "tmsConfig_processing_touchpointComponents"
+                                            ][i]
+                                        ] = touchpointComponents[i];
+                                    }
+                                    // add to TMSEvent.touchpoint_point_current_touchpointInfo_idProcessed
+                                    if (
+                                        typeof window.TMSEvent[
+                                            "touchpoint_point_current_touchpointInfo_idProcessed"
+                                        ] === "undefined"
+                                    ) {
+                                        window.TMSEvent[
+                                            "touchpoint_point_current_touchpointInfo_idProcessed"
+                                        ] =
+                                            "srcid" +
+                                            pv_delim +
+                                            i +
+                                            v_delim +
+                                            touchpointComponents[i];
+                                    } else {
+                                        window.TMSEvent[
+                                            "touchpoint_point_current_touchpointInfo_idProcessed"
+                                        ] =
+                                            TMSEvent[
+                                                "touchpoint_point_current_touchpointInfo_idProcessed"
+                                            ] +
+                                            c_delim +
+                                            i +
+                                            v_delim +
+                                            touchpointComponents[i];
+                                    }
+                                }
+                            } else {
+                                window.TMSHelper.console(
+                                    "[TMSProcessing.mapCurrentTouchpointValues] -> warning: touchpoint does not contain key-value-separators -> no mapping"
+                                );
+                                window.TMSEvent[
+                                    "touchpoint_point_current_touchpointInfo_idProcessed"
+                                ] =
+                                    window.TMSEvent["touchpoint_point_current_touchpointInfo_id"];
+                                window.TMSEvent["touchpoint_point_current_error"] =
+                                    "generic mapping - missing key-value-separators";
+                            }
+                        } else if (
+                            startWithWtmcid.test(
+                                window.TMSEvent["touchpoint_point_current_touchpointInfo_id"]
+                            )
+                        ) {
+                            window.TMSHelper.console(
+                                "[TMSProcessing.mapCurrentTouchpointValues] -> info: touchpoint prefix wtmcid found -> legacy mapping"
+                            );
+                            // remove prefix from touchpoint
+                            var touchpoint =
+                                window.TMSEvent[
+                                    "touchpoint_point_current_touchpointInfo_id"
+                                ].split(pv_delim)[1];
+                            // split touchpoint components
+                            var touchpointComponentsFound = touchpoint
+                                .split("_") // in legacy touchpoints, underscores were fixed separators
+                                .filter(Boolean); // remove empty items
+                            if (touchpointComponentsFound.length > 5) {
+                                var onlyNumbers = new RegExp("^[0-9]*$", "gi");
+                                var allowedChannels = new RegExp(
+                                    "aff|com|dsp|eml|mob|murl|ons|qrc|sem|soc|n-a",
+                                    "gi"
+                                );
+                                if (
+                                    typeof touchpointComponentsFound[0] === "string" &&
+                                    touchpointComponentsFound[0] === "z" &&
+                                    !isNaN(+touchpointComponentsFound[4]) &&
+                                    !isNaN(+touchpointComponentsFound[5])
+                                ) {
+                                    window.TMSHelper.console(
+                                        "[TMSProcessing.mapCurrentTouchpointValues] -> info: UM standard detected"
+                                    );
+ 
+                                    var touchpointComponents = {};
+                                    var touchpointComponentsLeftovers =
+                                        touchpointComponentsFound.slice();
+ 
+                                    loopComponentsConsidered: for (var i in window.TMSConfig[
+                                        "tmsConfig_processing_touchpointComponents"
+                                    ]) {
+                                        if (
+                                            window.TMSConfig[
+                                                "tmsConfig_processing_touchpointComponents"
+                                            ][i] ===
+                                            "touchpoint_point_current_touchpointInfo_requester"
+                                        ) {
+                                            touchpointComponents[i] = touchpointComponentsFound[2];
+                                            touchpointComponentsLeftovers[2] = undefined;
+                                        } else if (
+                                            window.TMSConfig[
+                                                "tmsConfig_processing_touchpointComponents"
+                                            ][i] ===
+                                            "touchpoint_point_current_marketingActivity_channelName"
+                                        ) {
+                                            touchpointComponents[i] = touchpointComponentsFound[3];
+                                            touchpointComponentsLeftovers[3] = undefined;
+                                        } else if (
+                                            window.TMSConfig[
+                                                "tmsConfig_processing_touchpointComponents"
+                                            ][i] ===
+                                            "touchpoint_point_current_marketingActivity_primaryTitle"
+                                        ) {
+                                            touchpointComponents[i] = touchpointComponentsFound[1];
+                                            touchpointComponentsLeftovers[1] = undefined;
+                                        } else {
+                                            touchpointComponents[i] = "unspecified";
+                                        }
+                                    }
+ 
+                                    // add the left over components as string to the end of the array of components
+                                    touchpointComponents["other"] = touchpointComponentsLeftovers
+                                        .filter(Boolean)
+                                        .join("_");
+ 
+                                    loopComponents: for (var i in touchpointComponents) {
+                                        // map component to TMSEvent
+                                        if (
+                                            window.TMSEvent.hasOwnProperty(
+                                                window.TMSConfig[
+                                                    "tmsConfig_processing_touchpointComponents"
+                                                ][i]
+                                            )
+                                        ) {
+                                            window.TMSHelper.console(
+                                                "[TMSProcessing.mapCurrentTouchpointValues] -> warning: TMSEvent already contains a value for " +
+                                                    window.TMSConfig[
+                                                        "tmsConfig_processing_touchpointComponents"
+                                                    ][i] +
+                                                    " -> not overwritten"
+                                            );
+                                        } else if (
+                                            typeof window.TMSConfig[
+                                                "tmsConfig_processing_touchpointComponents"
+                                            ][i] !== "undefined"
+                                        ) {
+                                            window.TMSEvent[
+                                                window.TMSConfig[
+                                                    "tmsConfig_processing_touchpointComponents"
+                                                ][i]
+                                            ] = touchpointComponents[i];
+                                        }
+                                        // add to TMSEvent.touchpoint_point_current_touchpointInfo_idProcessed
+                                        if (
+                                            typeof window.TMSEvent[
+                                                "touchpoint_point_current_touchpointInfo_idProcessed"
+                                            ] === "undefined"
+                                        ) {
+                                            window.TMSEvent[
+                                                "touchpoint_point_current_touchpointInfo_idProcessed"
+                                            ] =
+                                                "wtmcid" +
+                                                pv_delim +
+                                                i +
+                                                v_delim +
+                                                touchpointComponents[i];
+                                        } else {
+                                            window.TMSEvent[
+                                                "touchpoint_point_current_touchpointInfo_idProcessed"
+                                            ] =
+                                                TMSEvent[
+                                                    "touchpoint_point_current_touchpointInfo_idProcessed"
+                                                ] +
+                                                c_delim +
+                                                i +
+                                                v_delim +
+                                                touchpointComponents[i];
+                                        }
+                                    }
+                                } else if (
+                                    typeof touchpointComponentsFound[0] === "string" &&
+                                    touchpointComponentsFound[0] === "z" &&
+                                    allowedChannels.test(touchpointComponentsFound[3]) &&
+                                    touchpointComponentsFound.length >= 9 &&
+                                    touchpointComponentsFound.length <= 10
+                                ) {
+                                    window.TMSHelper.console(
+                                        "[TMSProcessing.mapCurrentTouchpointValues] -> info: 2018 standard detected"
+                                    );
+ 
+                                    var touchpointComponents = {};
+                                    var touchpointComponentsLeftovers =
+                                        touchpointComponentsFound.slice();
+                                    loopComponentsConsidered: for (var i in window.TMSConfig[
+                                        "tmsConfig_processing_touchpointComponents"
+                                    ]) {
+                                        if (
+                                            window.TMSConfig[
+                                                "tmsConfig_processing_touchpointComponents"
+                                            ][i] ===
+                                            "touchpoint_point_current_touchpointInfo_requester"
+                                        ) {
+                                            touchpointComponents[i] = touchpointComponentsFound[1];
+                                            touchpointComponentsLeftovers[1] = undefined;
+                                        } else if (
+                                            window.TMSConfig[
+                                                "tmsConfig_processing_touchpointComponents"
+                                            ][i] ===
+                                            "touchpoint_point_current_marketingActivity_targetAudience"
+                                        ) {
+                                            touchpointComponents[i] = touchpointComponentsFound[2];
+                                            touchpointComponentsLeftovers[2] = undefined;
+                                        } else if (
+                                            window.TMSConfig[
+                                                "tmsConfig_processing_touchpointComponents"
+                                            ][i] ===
+                                            "touchpoint_point_current_marketingActivity_channelName"
+                                        ) {
+                                            touchpointComponents[i] = touchpointComponentsFound[3];
+                                            touchpointComponentsLeftovers[3] = undefined;
+                                        } else if (
+                                            window.TMSConfig[
+                                                "tmsConfig_processing_touchpointComponents"
+                                            ][i] === "touchpoint_point_current_referrer_partner"
+                                        ) {
+                                            touchpointComponents[i] = touchpointComponentsFound[4];
+                                            touchpointComponentsLeftovers[4] = undefined;
+                                        } else if (
+                                            window.TMSConfig[
+                                                "tmsConfig_processing_touchpointComponents"
+                                            ][i] ===
+                                            "touchpoint_point_current_marketingActivity_pricingModel"
+                                        ) {
+                                            touchpointComponents[i] = touchpointComponentsFound[5];
+                                            touchpointComponentsLeftovers[5] = undefined;
+                                        } else if (
+                                            window.TMSConfig[
+                                                "tmsConfig_processing_touchpointComponents"
+                                            ][i] ===
+                                            "touchpoint_point_current_marketingActivity_primaryTitle"
+                                        ) {
+                                            touchpointComponents[i] = touchpointComponentsFound[6];
+                                            touchpointComponentsLeftovers[6] = undefined;
+                                        } else if (
+                                            window.TMSConfig[
+                                                "tmsConfig_processing_touchpointComponents"
+                                            ][i] ===
+                                            "touchpoint_point_current_touchpointInfo_language"
+                                        ) {
+                                            touchpointComponents[i] = touchpointComponentsFound[8];
+                                            touchpointComponentsLeftovers[8] = undefined;
+                                        } else {
+                                            touchpointComponents[i] = "unspecified";
+                                        }
+                                    }
+ 
+                                    // add the left over components as string to the end of the array of components
+                                    touchpointComponents["other"] = touchpointComponentsLeftovers
+                                        .filter(Boolean)
+                                        .join("_");
+ 
+                                    loopComponents: for (var i in touchpointComponents) {
+                                        // map component to TMSEvent
+                                        if (
+                                            window.TMSEvent.hasOwnProperty(
+                                                window.TMSConfig[
+                                                    "tmsConfig_processing_touchpointComponents"
+                                                ][i]
+                                            )
+                                        ) {
+                                            window.TMSHelper.console(
+                                                "[TMSProcessing.mapCurrentTouchpointValues] -> warning: TMSEvent already contains a value for " +
+                                                    window.TMSConfig[
+                                                        "tmsConfig_processing_touchpointComponents"
+                                                    ][i] +
+                                                    " -> not overwritten"
+                                            );
+                                        } else if (
+                                            typeof window.TMSConfig[
+                                                "tmsConfig_processing_touchpointComponents"
+                                            ][i] !== "undefined"
+                                        ) {
+                                            window.TMSEvent[
+                                                window.TMSConfig[
+                                                    "tmsConfig_processing_touchpointComponents"
+                                                ][i]
+                                            ] = touchpointComponents[i];
+                                        }
+                                        // add to TMSEvent.touchpoint_point_current_touchpointInfo_idProcessed
+                                        if (
+                                            typeof window.TMSEvent[
+                                                "touchpoint_point_current_touchpointInfo_idProcessed"
+                                            ] === "undefined"
+                                        ) {
+                                            window.TMSEvent[
+                                                "touchpoint_point_current_touchpointInfo_idProcessed"
+                                            ] =
+                                                "wtmcid" +
+                                                pv_delim +
+                                                i +
+                                                v_delim +
+                                                touchpointComponents[i];
+                                        } else {
+                                            window.TMSEvent[
+                                                "touchpoint_point_current_touchpointInfo_idProcessed"
+                                            ] =
+                                                TMSEvent[
+                                                    "touchpoint_point_current_touchpointInfo_idProcessed"
+                                                ] +
+                                                c_delim +
+                                                i +
+                                                v_delim +
+                                                touchpointComponents[i];
+                                        }
+                                    }
+                                } else {
+                                    window.TMSHelper.console(
+                                        "[TMSProcessing.mapCurrentTouchpointValues] -> info: no legacy case detected -> no mapping"
+                                    );
+                                    window.TMSEvent[
+                                        "touchpoint_point_current_touchpointInfo_idProcessed"
+                                    ] =
+                                        window.TMSEvent[
+                                            "touchpoint_point_current_touchpointInfo_id"
+                                        ];
+                                }
+                            } else {
+                                window.TMSHelper.console(
+                                    "[TMSProcessing.mapCurrentTouchpointValues] -> warning: too few touchpoint components found -> no mapping"
+                                );
+                                window.TMSEvent[
+                                    "touchpoint_point_current_touchpointInfo_idProcessed"
+                                ] =
+                                    window.TMSEvent["touchpoint_point_current_touchpointInfo_id"];
+                                window.TMSEvent["touchpoint_point_current_error"] =
+                                    "legacy mapping - number of components";
+                            }
+                        } else {
+                            window.TMSHelper.console(
+                                "[TMSProcessing.mapCurrentTouchpointValues] -> info: neither srcid nor wtmcid prefix found -> no mapping"
+                            );
+                            window.TMSEvent[
+                                "touchpoint_point_current_touchpointInfo_idProcessed"
+                            ] = window.TMSEvent["touchpoint_point_current_touchpointInfo_id"];
+                        }
+                    } else {
+                        window.TMSHelper.console(
+                            "[TMSProcessing.mapCurrentTouchpointValues] -> warning: no valid touchpoint prefix found -> no mapping"
+                        );
+                        window.TMSEvent[
+                            "touchpoint_point_current_touchpointInfo_idProcessed"
+                        ] = window.TMSEvent["touchpoint_point_current_touchpointInfo_id"];
+                        window.TMSEvent["touchpoint_point_current_error"] =
+                            "missing touchpoint prefix";
+                    }
+                } catch (error) {
+                    window.TMSEvent["touchpoint_point_current_error"] = error;
+                }
+            } else {
+                window.TMSHelper.console(
+                    "[TMSProcessing.mapCurrentTouchpointValues] -> info: no current touchpoint found or missing configuration"
+                );
+            }
+        } else {
+            window.TMSHelper.console(
+                "[TMSProcessing.mapCurrentTouchpointValues] -> warning: TMSEvent or TMSConfig not defined"
+            );
+        }
+ 
+        window.TMSHelper.console(
+            "[TMSProcessing.mapCurrentTouchpointValues] complete"
+        );
+    } catch (error) {
+        TMSHelper.console("[TMSProcessing.mapCurrentTouchpointValues] error:");
+        TMSHelper.errorHandler(error);
+    }
+};
+
+// +++++++++++++++++++++++++++++++++++++++++++++++++++++++
+// 1121 TMSProcessing.getPlatformEnvironment
+// Issued by: Agnosticalyze
+// version: 1.2, 2021-02-15
+// +++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ 
+// Sets the TMSEvent variable identifying the platform environment for later use in other functions.
+window.TMSProcessing = window.TMSProcessing || {}; // remove this line if function is included inside a collection wrapper
+window.TMSProcessing.getPlatformEnvironment = function () { // remove this line for including function inside a collection wrapper
+// function getPlatformEnvironment() { // uncomment this line for including function inside a collection wrapper   
+    try {
+        window.TMSHelper.console("[TMSProcessing.getPlatformEnvironment] start");
+      
+        if (typeof window.TMSEvent === "object" && typeof window.TMSConfig === "object") {
+            if (typeof window.TMSEvent['platform_platformInfo_environment'] === "undefined" || window.TMSEvent['platform_platformInfo_environment'] === null || window.TMSEvent['platform_platformInfo_environment'] === "") {
+                // environment was not identified before
+                if (typeof window.TMSConfig['tmsConfig_prodDomains'] === "object" && Object.keys(window.TMSConfig['tmsConfig_prodDomains']).length > 0) {
+                    // check against predefined prod domains
+                    if (typeof window.TMSEvent['page_url_canonical_hostname'] === "string" && window.TMSEvent['page_url_canonical_hostname'] !== "") {
+                        if (window.TMSConfig['tmsConfig_prodDomains'].includes(window.TMSEvent['page_url_canonical_hostname'])) {
+                            window.TMSEvent['platform_platformInfo_environment'] = "prod";
+                            window.TMSHelper.console("[TMSProcessing.getPlatformEnvironment] -> info: based on Canonical Hostname in TMSEvent, TMSEvent[platform_platformInfo_environment] set to: " + window.TMSEvent['platform_platformInfo_environment']);
+                        } else {
+                            window.TMSEvent['platform_platformInfo_environment'] = "dev";
+                            window.TMSHelper.console("[TMSProcessing.getPlatformEnvironment] -> info: based on Canonical Hostname in TMSEvent, TMSEvent[platform_platformInfo_environment] set to: " + window.TMSEvent['platform_platformInfo_environment']);
+                        }
+                    } else if (typeof window.TMSEvent['page_url_window_hostname'] === "string" && window.TMSEvent['page_url_window_hostname'] !== "") {
+                        if (window.TMSConfig['tmsConfig_prodDomains'].includes(window.TMSEvent['page_url_window_hostname'])) {
+                            window.TMSEvent['platform_platformInfo_environment'] = "prod";
+                            window.TMSHelper.console("[TMSProcessing.getPlatformEnvironment] -> info: based on Window Hostname in TMSEvent, TMSEvent[platform_platformInfo_environment] set to: " + window.TMSEvent['platform_platformInfo_environment']);
+                        } else {
+                            window.TMSEvent['platform_platformInfo_environment'] = "dev";
+                            window.TMSHelper.console("[TMSProcessing.getPlatformEnvironment] -> info: based on Window Hostname in TMSEvent, TMSEvent[platform_platformInfo_environment] set to: " + window.TMSEvent['platform_platformInfo_environment']);
+                        }
+                    } else {
+                        if (window.TMSConfig['tmsConfig_prodDomains'].includes(window.location.hostname)) {
+                            window.TMSEvent['platform_platformInfo_environment'] = "prod";
+                            window.TMSHelper.console("[TMSProcessing.getPlatformEnvironment] -> info: based on window.location.hostname, TMSEvent[platform_platformInfo_environment] set to: " + window.TMSEvent['platform_platformInfo_environment']);
+                        } else {
+                            window.TMSEvent['platform_platformInfo_environment'] = "dev";
+                            window.TMSHelper.console("[TMSProcessing.getPlatformEnvironment] -> info: based on window.location.hostname, TMSEvent[platform_platformInfo_environment] set to: " + window.TMSEvent['platform_platformInfo_environment']);
+                        }
+                    }
+                } else {
+                    // default: set to dev
+                    window.TMSEvent['platform_platformInfo_environment'] = "dev";
+                    window.TMSHelper.console("[TMSProcessing.getPlatformEnvironment] -> info: by default, TMSEvent[platform_platformInfo_environment] set to: " + window.TMSEvent['platform_platformInfo_environment']);
+                }
+            } else {
+                // environment was identified or defined (by DEV) before
+                window.TMSHelper.console("[TMSProcessing.getPlatformEnvironment] -> warning: Did not overwrite pre-existing TMSEvent[platform_platformInfo_environment]: " + window.TMSEvent['platform_platformInfo_environment']);
+            }
+        } else {
+            window.TMSHelper.console("[TMSProcessing.getPlatformEnvironment] -> warning: TMSEvent and/or TMSConfig not defined");
+        }
+      
+        window.TMSHelper.console("[TMSProcessing.getPlatformEnvironment] complete");
+    } catch (err) {
+        window.TMSHelper.console("[TMSProcessing.getPlatformEnvironment] error:");
+        window.TMSHelper.errorHandler(err);
+  
+    }
+};
+
+// +++++++++++++++++++++++++++++++++++++++++++++++++++++++
+// 1122 TMSProcessing.getEmbedInfo
+// Issued by: Agnosticalyze
+// version: 1.0, 2021-03-13
+// +++++++++++++++++++++++++++++++++++++++++++++++++++++++
+  
+window.TMSProcessing = window.TMSProcessing || {}; // remove this line if function is included inside a collection wrapper
+window.TMSProcessing.getEmbedInfo = function () { // remove this line for including function inside a collection wrapper
+// function getEmbedInfo() {  // uncomment this line for including function inside a collection wrapper
+    try {
+        window.TMSHelper.console("[TMSProcessing.getEmbedInfo] start");
+              
+        if (typeof TMSEvent === "object") {
+            if (window.top !== window) {
+                window.TMSHelper.console("[TMSProcessing.getEmbedInfo] -> info: the current page is embedded");
+                TMSEvent['embed_embedInfo_embedType'] = "iframe";
+            } else {
+                window.TMSHelper.console("[TMSProcessing.getEmbedInfo] -> info: the current page is not embedded");
+            }
+        } else {
+            window.TMSHelper.console("[TMSProcessing.getEmbedInfo] -> info: TMSEvent not defined");
+        }
+         
+      
+        window.TMSHelper.console("[TMSProcessing.getEmbedInfo] complete");
+    } catch (err) {
+        window.TMSHelper.console("[TMSProcessing.getEmbedInfo] error:");
+        window.TMSHelper.errorHandler(err);
+    }
+};
+
+// +++++++++++++++++++++++++++++++++++++++++++++++++++++++
+// 1131 TMSProcessing.getStandardElementAttributes
+// Issued by: Agnosticalyze
+// version: 1.3.2, 2022-06-02
+// +++++++++++++++++++++++++++++++++++++++++++++++++++++++
+  
+window.TMSProcessing = window.TMSProcessing || {}; // remove this line if function is included inside a collection wrapper
+window.TMSProcessing.getStandardElementAttributes = function (thisElement) { // remove this line for including function inside a collection wrapper
+// function getStandardElementAttributes(thisElement) {  // uncomment this line for including function inside a collection wrapper
+    try {
+        window.TMSHelper.console("[TMSProcessing.getStandardElementAttributes] start");
+  
+        var output = {};
+          
+        if (typeof thisElement === "object") {
+              
+            // target URL
+            if (typeof window.TMSHelper.getURLFromHtmlElement === "function") {
+                tgtUrl = window.TMSHelper.getURLFromHtmlElement("target", thisElement);
+                output['event_element_tgtUrl_url'] = tgtUrl;
+                window.TMSHelper.console("[TMSProcessing.getStandardElementAttributes] -> info: event_element_tgtUrl_url set: " + output['event_element_tgtUrl_url']);
+            } else {
+                window.TMSHelper.console("[TMSProcessing.getStandardElementAttributes] -> warning: TMSHelper.getURLFromHtmlElement not defined");
+            }
+         
+            // className
+            if (typeof thisElement.className !== "undefined" && thisElement.className.trim() !== "") {
+                output['event_element_elementClassName'] = thisElement.className.trim();
+                window.TMSHelper.console("[TMSProcessing.getStandardElementAttributes] -> info: event_element_elementClassName set: " + output['event_element_elementClassName']);
+            } else {
+                window.TMSHelper.console("[TMSProcessing.getStandardElementAttributes] -> info: no className found");
+            }
+  
+            // id
+            if (typeof thisElement.id !== "undefined" && thisElement.id.trim() !== "") {
+                output['event_element_elementID'] = thisElement.id.trim();
+                window.TMSHelper.console("[TMSProcessing.getStandardElementAttributes] -> info: event_element_elementID set: " + output['event_element_elementID']);
+            } else {
+                window.TMSHelper.console("[TMSProcessing.getStandardElementAttributes] -> info: no ID found");
+            }
+         
+            // innerText
+            if (typeof thisElement.innerText !== "undefined" && thisElement.innerText.trim() !== "") {
+                output['event_element_elementInnerText'] = thisElement.innerText.trim();
+                window.TMSHelper.console("[TMSProcessing.getStandardElementAttributes] -> info: event_element_elementInnerText set: " + output['event_element_elementInnerText']);
+            } else {
+                window.TMSHelper.console("[TMSProcessing.getStandardElementAttributes] -> info: no innerText found");
+            }
+         
+            // name
+            if (typeof thisElement.name !== "undefined" && thisElement.name.trim() !== "") {
+                output['event_element_elementName'] = thisElement.name.trim();
+                window.TMSHelper.console("[TMSProcessing.getStandardElementAttributes] -> info: event_element_elementName set: " + output['event_element_elementName']);
+            } else {
+                window.TMSHelper.console("[TMSProcessing.getStandardElementAttributes] -> info: no name found");
+            }
+  
+            // tagName
+            if (typeof thisElement.tagName !== "undefined" && thisElement.tagName.trim() !== "") {
+                output['event_element_elementTagName'] = thisElement.tagName.trim();
+                window.TMSHelper.console("[TMSProcessing.getStandardElementAttributes] -> info: event_element_elementTagName set: " + output['event_element_elementTagName']);
+            } else {
+                window.TMSHelper.console("[TMSProcessing.getStandardElementAttributes] -> info: no tagName found");
+            }
+  
+            // title
+            if (typeof thisElement.title !== "undefined" && thisElement.title.trim() !== "") {
+                output['event_element_elementTitle'] = thisElement.title.trim();
+                window.TMSHelper.console("[TMSProcessing.getStandardElementAttributes] -> info: event_element_elementTitle set: " + output['event_element_elementTitle']);
+            } else {
+                window.TMSHelper.console("[TMSProcessing.getStandardElementAttributes] -> info: no title found");
+            }
+         
+            // value
+            if (typeof thisElement.value !== "undefined" && thisElement.value.trim() !== "") {
+                output['event_element_elementValue'] = thisElement.value.trim();
+                window.TMSHelper.console("[TMSProcessing.getStandardElementAttributes] -> info: event_element_elementValue set: " + output['event_element_elementValue']);
+            } else {
+                window.TMSHelper.console("[TMSProcessing.getStandardElementAttributes] -> info: no value found");
+            }
+  
+        } else {
+            window.TMSHelper.console("[TMSProcessing.getStandardElementAttributes] -> warning: No valid interacted element 'this' passed to this function");          
+        }
+  
+        window.TMSHelper.console("[TMSProcessing.getStandardElementAttributes] complete");
+        return output;
+    } catch (err) {
+        window.TMSHelper.console("[TMSProcessing.getStandardElementAttributes] error:");
+        window.TMSHelper.errorHandler(err);
+        return {};
+    }
+};
+
+// +++++++++++++++++++++++++++++++++++++++++++++++++++++++
+// 1132 TMSProcessing.getMarkupElementContent
+// Issued by: Agnosticalyze
+// version: 1.3, 2021-05-21
+// +++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    
+window.TMSProcessing = window.TMSProcessing || {}; // remove this line if function is included inside a collection wrapper
+window.TMSProcessing.getMarkupElementContent = function (thisElement) { // remove this line for including function inside a collection wrapper
+// function getMarkupElementContent(thisElement) {  // uncomment this line for including function inside a collection wrapper
+    try {
+        window.TMSHelper.console("[TMSProcessing.getMarkupElementContent] start");
+                
+        var output = {};
+        
+        if (typeof thisElement === "object") {
+            if (thisElement.hasAttribute("data-track-prevent")) {
+                output['event_element_elementContentTrackPreventFound'] = true;
+            } else if (thisElement.hasAttribute("data-track-elementcontent")) {
+                try {
+                    output = JSON.parse(thisElement.getAttribute("data-track-elementcontent"));
+                    output['event_element_elementContentFound'] = true;
+                } catch (e) {
+                    if (e.message.indexOf('Unexpected token &') !== -1) {
+                        window.TMSHelper.console("[TMSProcessing.getMarkupElementContent] Possible double encoding found, trying to handle that");
+                        try {
+                            output = JSON.parse(thisElement.getAttribute("data-track-elementcontent").replace(new RegExp('&' + 'quot;', 'g'), '"'));
+                            output['event_element_elementContentFound'] = true;
+                            window.TMSHelper.console("[TMSProcessing.getMarkupElementContent] Double encoding resolved, continuing");
+                        } catch (err) {
+                            window.TMSHelper.console("[TMSProcessing.getMarkupElementContent] Couldn't parse data-track-elementcontent as JSON with possible double encoding");
+                            window.TMSHelper.errorHandler(e);
+                        }
+                    } else {
+                        window.TMSHelper.console("[TMSProcessing.getMarkupElementContent] Couldn't parse data-track-elementcontent as JSON");
+                        window.TMSHelper.errorHandler(e);
+                    }
+                }
+            } else {
+                window.TMSHelper.console("[TMSProcessing.getMarkupElementContent] -> info: No data-track-elementcontent or data-track-prevent attribute found on element");
+            }
+               
+        } else {
+            window.TMSHelper.console("[TMSProcessing.getMarkupElementContent] -> warning: No valid interacted element 'this' passed to this function");
+        }
+    
+        window.TMSHelper.console("[TMSProcessing.getMarkupElementContent] complete");
+        return output;
+    } catch (err) {
+        window.TMSHelper.console("[TMSProcessing.getMarkupElementContent] error:");
+        window.TMSHelper.errorHandler(err);
+        return {};
+    }
+};
+
+// +++++++++++++++++++++++++++++++++++++++++++++++++++++++
+// 1133 TMSProcessing.getMarkupLevelContent
+// Issued by: Agnosticalyze
+// version: 1.3, 2022-07-25
+// +++++++++++++++++++++++++++++++++++++++++++++++++++++++
+  
+window.TMSProcessing = window.TMSProcessing || {}; // remove this line if function is included inside a collection wrapper
+window.TMSProcessing.getMarkupLevelContent = function (thisElement) { // remove this line for including function inside a collection wrapper
+// function getMarkupLevelContent(thisElement) {  // uncomment this line for including function inside a collection wrapper
+    try {
+        window.TMSHelper.console("[TMSProcessing.getMarkupLevelContent] start");
+              
+        var output = {};
+      
+        if (typeof thisElement === "object") {
+  
+            // determine, whether content hierarchy should be collected at all
+            // => either there is levelContent on the page or the collection is explicitly enforced by TMSConfig
+            if ((document.querySelectorAll('[data-track-levelcontent]').length > 0) || (typeof window.TMSConfig === "object" && window.TMSConfig['tmsConfig_event_collectContentHierarchy'])) {
+                // determined: content hierarchy shall be collected
+                  
+                if (document.querySelectorAll('[data-track-levelcontent]').length > 0) {
+                    // determined: there are data-track-levelcontent elements anywhere on the page
+  
+                    // ------------------------------------------------------------------------ //
+                    // TBA:                                                                     //
+                    //                                                                          //
+                    // if data-track-levelnumber (in addition to levelcontent) elements are     //
+                    //   anywhere on the page, use them...                                      //
+                    // else, only use data-track-levelcontent without levelnumbers              //
+                    // ------------------------------------------------------------------------ //
+  
+                    // get all parents of thisElement
+                    var parentNodes = window.TMSHelper.getParentHtmlElementsOfHtmlElement(thisElement);
+                                  
+                    // check each node for level content
+                    // => walk through nodes backwards: from top level (e.g. the <body>) to the last parent of the clicked element
+                    loopNodes: for (var i = parentNodes.length - 1; i >= 0; i--) {
+                        if (parentNodes[i].nodeName !== '#document-fragment') { // exclude document-fragments from loop
+                        	if (parentNodes[i].hasAttribute("data-track-prevent")) {
+	                            output['event_element_levelContentTrackPreventFound'] = true;
+	                            break loopNodes; // if prevent flag was found, further collection is pointless anyway
+	                        } else if (parentNodes[i].hasAttribute("data-track-levelcontent")) {
+	                            // get level content
+	                            var currentNodeContentInitial = {};
+	                            try {
+	                                currentNodeContentInitial = JSON.parse(parentNodes[i].getAttribute("data-track-levelcontent"));
+	                            } catch (e) {
+	                                if (e.message.indexOf('Unexpected token &') !== -1) {
+	                                    window.TMSHelper.console("[TMSProcessing.getMarkupLevelContent] Possible double encoding found, trying to handle that");
+	                                    try {
+	                                        currentNodeContentInitial = JSON.parse(parentNodes[i].getAttribute("data-track-levelcontent").replace(new RegExp('&' + 'quot;', 'g'), '"'));
+	                                        window.TMSHelper.console("[TMSProcessing.getMarkupLevelContent] Double encoding resolved, continuing");
+	                                    } catch (err) {
+	                                        window.TMSHelper.console("[TMSProcessing.getMarkupLevelContent] Couldn't parse data-track-levelcontent as JSON with possible double encoding");
+	                                        window.TMSHelper.errorHandler(e);
+	                                    }
+	                                } else {
+	                                    window.TMSHelper.console("[TMSProcessing.getMarkupLevelContent] Couldn't parse data-track-levelcontent as JSON");
+	                                    window.TMSHelper.errorHandler(e);
+	                                }
+	                            }
+	              
+	                            var currentNodeContentArray = Object.keys(currentNodeContentInitial)
+	              
+	                            loopParameters: for (var j = 0; j < currentNodeContentArray.length; j++) {
+	                                var paramName = currentNodeContentArray[j]
+	                                var paramValue = currentNodeContentInitial[paramName];
+	  
+	                                if (paramName !== "" && paramValue !== "") {
+	                                      
+	                                    if (paramName === "element_elementInfo_elementName") {
+	                                        // concat event_element_parentLevelNames
+	                                        if (typeof output['event_element_parentLevelNames'] === "string" && output['event_element_parentLevelNames'] !== "") {
+	                                            // append current level name
+	                                            output['event_element_parentLevelNames'] = output['event_element_parentLevelNames'] + "::" + paramValue;
+	                                        } else {
+	                                            output['event_element_parentLevelNames'] = paramValue;
+	                                        }
+	                                    } // end if
+	                  
+	                                    // (over-)write current parameter into output -> no concatenation of all other values, lowest value wins
+	                                    output[paramName] = paramValue;
+	                                } // end if
+	                            } // end loopParameters
+	 
+	                            output['event_element_levelContentFound'] = true;
+	                        } //end if: hasAttribute
+                        } // end if: nodeName                        
+                    } // end loopNodes
+  
+                    // clear the output if necessary
+                    if (output['event_element_levelContentTrackPreventFound']) {
+                        output = {};
+                        output['event_element_levelContentTrackPreventFound'] = true;
+                    }                   
+                } else {
+                    // no levelcontent on page, use element IDs instead
+        
+                    // get all parents of thisElement
+                    var parentNodes = window.TMSHelper.getParentHtmlElementsOfHtmlElement(thisElement);
+                     
+                    // check each node for its id
+                    loopNodes: for (var i = parentNodes.length - 1; i >= 0; i--) {
+                        if (parentNodes[i].nodeName !== '#document-fragment') { // exclude document-fragments from loop
+                        	if (parentNodes[i].hasAttribute("data-track-prevent")) {
+	                            output['event_element_levelContentTrackPreventFound'] = true;
+	                            break loopNodes; // if prevent flag was found, further collection is pointless anyway
+	                        } else if (parentNodes[i].hasAttribute("id")) {
+	                            // get level content
+	                            var currentNodeId = parentNodes[i].getAttribute("id");
+	                                
+	                            if (currentNodeId !== "") {
+	                                // concat event_element_parentLevelNames
+	                                if (typeof output['event_element_parentLevelNames'] === "string" && output['event_element_parentLevelNames'] !== "") {
+	                                    // append current level name
+	                                    output['event_element_parentLevelNames'] = output['event_element_parentLevelNames'] + "::" + currentNodeId;
+	                                } else {
+	                                    output['event_element_parentLevelNames'] = currentNodeId;
+	                                }
+	                            } // end if
+	                        } //end if: hasAttribute
+	                    } // end if: document-fragment
+                    } // end loopNodes
+ 
+                    // clear the output if necessary
+                    if (output['event_element_levelContentTrackPreventFound']) {
+                        output = {};
+                        output['event_element_levelContentTrackPreventFound'] = true;
+                    }
+                } // end if
+            } else {
+                 window.TMSHelper.console("[TMSProcessing.getMarkupLevelContent] -> info: No data-track-levelcontent found on page or collection not explicitly activated by TMSConfig[tmsConfig_event_collectContentHierarchy]");
+            } // end if
+  
+        } else {
+            window.TMSHelper.console("[TMSProcessing.getMarkupLevelContent] -> warning: No valid interacted element 'this' passed to this function");
+        }
+      
+        window.TMSHelper.console("[TMSProcessing.getMarkupLevelContent] complete");
+        return output;
+    } catch (err) {
+        window.TMSHelper.console("[TMSProcessing.getMarkupLevelContent] error:");
+        window.TMSHelper.errorHandler(err);
+        return {};
+    }
+};
+
+// +++++++++++++++++++++++++++++++++++++++++++++++++++++++
+// 1139 TMSProcessing.runEventCollectionOrchestrator
+// Issued by: Agnosticalyze
+// version: 1.5, 2021-07-30
+// +++++++++++++++++++++++++++++++++++++++++++++++++++++++
+   
+// Run Event Collection Orchestrator
+window.TMSProcessing = window.TMSProcessing || {}; // remove this line if function is included inside a collection wrapper
+window.TMSProcessing.runEventCollectionOrchestrator = function (thisElement, initEventData) { // remove this line for including function inside a collection wrapper
+// function runEventCollectionOrchestrator(thisElement) {  // uncomment this line for including function inside a collection wrapper
+    try {
+        window.TMSHelper.console("[TMSProcessing.runEventCollectionOrchestrator] start");
+        var eventData = initEventData || {};
+       
+        if (typeof thisElement === "object") {
+       
+            // 1 collect information
+            // 1.1 collect standard data, like target URL
+            if (typeof window.TMSProcessing.getStandardElementAttributes === "function") {
+                var standardData = window.TMSProcessing.getStandardElementAttributes(thisElement);
+            } else {
+                var standardData = {};
+            }
+     
+            // 1.2 collect element enrichment from "data-track-elementcontent" attribute
+            if (typeof window.TMSProcessing.getMarkupElementContent === "function") {
+                var elementData = window.TMSProcessing.getMarkupElementContent(thisElement);
+            } else {
+                var elementData = {};
+            }
+       
+            // 1.3 collect content hierarchy enrichment
+            if (typeof window.TMSProcessing.getMarkupLevelContent === "function") {
+                var contentHierarchyData = window.TMSProcessing.getMarkupLevelContent(thisElement);
+            } else {
+                var contentHierarchyData = {};
+            }
+   
+            
+            // 3 merge
+            eventData = window.TMSHelper.copyVarsFromObjectToObject({
+                sourceObject: elementData
+                , mergeObject: eventData
+                , targetPrefix: ""
+                , overwrite: false
+                , harmonize: true
+                , includeFromSource: {}
+                , excludeFromSource: {}
+                , includeFromMerge: {}
+                , excludeFromMerge: {}
+                , flatten: false
+            });
+            eventData = window.TMSHelper.copyVarsFromObjectToObject({
+                sourceObject: contentHierarchyData
+                , mergeObject: eventData
+                , targetPrefix: ""
+                , overwrite: false
+                , harmonize: true
+                , includeFromSource: {}
+                , excludeFromSource: {}
+                , includeFromMerge: {}
+                , excludeFromMerge: {}
+                , flatten: false
+            });
+            eventData = window.TMSHelper.copyVarsFromObjectToObject({
+                sourceObject: standardData
+                , mergeObject: eventData
+                , targetPrefix: ""
+                , overwrite: false
+                , harmonize: false
+                , includeFromSource: {}
+                , excludeFromSource: {}
+                , includeFromMerge: {}
+                , excludeFromMerge: {}
+                , flatten: false
+            });
+                 
+        } else {
+            window.TMSHelper.console("[TMSProcessing.runEventCollectionOrchestrator] -> warning: No valid interacted element 'this' identified");
+        }
+
+        return eventData;
+       
+        window.TMSHelper.console("[TMSProcessing.runEventCollectionOrchestrator] complete");
+    } catch (err) {
+        window.TMSHelper.console("[TMSProcessing.runEventCollectionOrchestrator] error:");
+        window.TMSHelper.errorHandler(err);
+    }
+};
+
+// +++++++++++++++++++++++++++++++++++++++++++++++++++++++
+// 1141 TMSProcessing.identifyStandardEventCase
+// Issued by: Agnosticalyze
+// version: 1.3, 2021-09-22
+// +++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ 
+ // set event variables according to standard cases (if not already set, e.g. by collectors)
+window.TMSProcessing = window.TMSProcessing || {}; // remove this line if function is included inside a collection wrapper
+window.TMSProcessing.identifyStandardEventCase = function (input) { // remove this line for including function inside a collection wrapper
+// function identifyStandardEventCase(input) {  // uncomment this line for including function inside a collection wrapper
+    try {
+        window.TMSHelper.console("[TMSProcessing.identifyStandardEventCase] start");
+    
+        if (typeof input === "object") {
+            if (typeof input['event_element_tgtUrl_url'] !== "undefined" && input['event_element_tgtUrl_url'] !== "") {
+                var output = input;
+        
+                // set flag for 'Anchor' case
+                if (typeof window.TMSHelper.isAnchorToSamePage === "function") {
+                    output['event_attributes_isAnchor'] = window.TMSHelper.isAnchorToSamePage(input['event_element_tgtUrl_url']);
+                    window.TMSHelper.console("[TMSProcessing.identifyStandardEventCase] -> info: Set Anchor Link flag to = " + output['event_attributes_isAnchor'].toString());
+                } else {
+                    window.TMSHelper.console("[TMSProcessing.identifyStandardEventCase] -> warning: TMSHelper.isAnchorToSamePage not defined");
+                }
+        
+                // set flag for 'Download' case
+                if (typeof window.TMSHelper.isDownloadLink === "function") {
+                    output['event_attributes_isDownload'] = window.TMSHelper.isDownloadLink(input['event_element_tgtUrl_url']);
+                    window.TMSHelper.console("[TMSProcessing.identifyStandardEventCase] -> info: Set Download Link flag to = " + output['event_attributes_isDownload'].toString());
+                } else {
+                    window.TMSHelper.console("[TMSProcessing.identifyStandardEventCase] -> warning: TMSHelper.isDownloadLink not defined");
+                }
+                
+                // set flag for 'Social Share' case
+                if (typeof window.TMSHelper.isShareLink === "function") {
+                    output['event_attributes_isSharelink'] = window.TMSHelper.isShareLink(input['event_element_tgtUrl_url']);
+                    window.TMSHelper.console("[TMSProcessing.identifyStandardEventCase] -> info: Set Share Link flag to = " + output['event_attributes_isSharelink'].toString());
+                } else {
+                    window.TMSHelper.console("[TMSProcessing.identifyStandardEventCase] -> warning: TMSHelper.isShareLink not defined");
+                }
+        
+                // set flag for 'Mailto' case
+                if (typeof window.TMSHelper.isEmailLink === "function") {
+                    output['event_attributes_isMailto'] = window.TMSHelper.isEmailLink(input['event_element_tgtUrl_url']);
+                    window.TMSHelper.console("[TMSProcessing.identifyStandardEventCase] -> info: Set Mailto Link flag to = " + output['event_attributes_isMailto'].toString());
+                } else {
+                    window.TMSHelper.console("[TMSProcessing.identifyStandardEventCase] -> warning: TMSHelper.isEmailLink not defined");
+                }
+        
+                // set flag for 'OnSite' case
+                if (typeof window.TMSHelper.isOnsiteLink === "function") {
+                    output['event_attributes_isOnsite'] = window.TMSHelper.isOnsiteLink(input['event_element_tgtUrl_url']);
+                    window.TMSHelper.console("[TMSProcessing.identifyStandardEventCase] -> info: Set Onsite Event flag to = " + output['event_attributes_isOnsite'].toString());
+                } else {
+                    window.TMSHelper.console("[TMSProcessing.identifyStandardEventCase] -> warning: TMSHelper.isOnsiteLink not defined");
+                }
+        
+                // set flag for 'Phone' case
+                if (typeof window.TMSHelper.isPhoneLink === "function") {
+                    output['event_attributes_isPhone'] = window.TMSHelper.isPhoneLink(input['event_element_tgtUrl_url']);
+                    window.TMSHelper.console("[TMSProcessing.identifyStandardEventCase] -> info: Set Phone Link flag to = " + output['event_attributes_isPhone'].toString());
+                } else {
+                    window.TMSHelper.console("[TMSProcessing.identifyStandardEventCase] -> warning: TMSHelper.isPhoneLink not defined");
+                }
+        
+                window.TMSHelper.console("[TMSProcessing.identifyStandardEventCase] complete");
+                return output;
+            } else {
+                window.TMSHelper.console("[TMSProcessing.identifyStandardEventCase] -> warning: No target URL defined, no standard flags set");
+                window.TMSHelper.console("[TMSProcessing.identifyStandardEventCase] complete");
+                return input;
+            }
+        } else {
+            window.TMSHelper.console("[TMSProcessing.identifyStandardEventCase] -> warning: invalid call of function");
+            window.TMSHelper.console("[TMSProcessing.identifyStandardEventCase] complete");
+            return {};
+        }
+    } catch (err) {
+        window.TMSHelper.console("[TMSProcessing.identifyStandardEventCase] error:");
+        window.TMSHelper.errorHandler(err);
+        return input;
+    }
+};
+
+// +++++++++++++++++++++++++++++++++++++++++++++++++++++++
+// 1142 TMSProcessing.setEventTriggerFlag
+// Issued by: Agnosticalyze
+// version: 1.2, 2021-08-20
+// +++++++++++++++++++++++++++++++++++++++++++++++++++++++
+  
+// Run Event Collection Orchestrator
+window.TMSProcessing = window.TMSProcessing || {}; // remove this line if function is included inside a collection wrapper
+window.TMSProcessing.setEventTriggerFlag = function (input) { // remove this line for including function inside a collection wrapper
+// function setEventTriggerFlag(input) {  // uncomment this line for including function inside a collection wrapper
+    try {
+        window.TMSHelper.console("[TMSProcessing.setEventTriggerFlag] start");
+ 
+        var output = input;
+        
+        if (typeof input === "object" && Object.keys(input).length > 0 && typeof window.TMSConfig === "object") {
+            output['event_processing_sendRequest'] = false;
+            if (input['event_element_elementContentTrackPreventFound'] || input['event_element_levelContentTrackPreventFound']) {
+                output['event_processing_sendRequest'] = false;
+                window.TMSHelper.console("[TMSProcessing.setEventTriggerFlag] -> info: tracking prevention flag found, event_processing_sendRequest set to FALSE");
+            } else if (window.TMSConfig['tmsConfig_event_trackDefault']) {
+                output['event_processing_sendRequest'] = true;
+                window.TMSHelper.console("[TMSProcessing.setEventTriggerFlag] -> info: element content found, event_processing_sendRequest set to: " + output['event_processing_sendRequest']);
+            } else if (input['event_element_elementContentFound']) {
+                output['event_processing_sendRequest'] = true;
+                window.TMSHelper.console("[TMSProcessing.setEventTriggerFlag] -> info: element content found, event_processing_sendRequest set to: " + output['event_processing_sendRequest']);
+              } else if (window.TMSConfig['tmsConfig_event_trackLinkOnsite'] && (input['event_attributes_isOnsite'] && input['event_attributes_isAnchor'])) {
+                output['event_processing_sendRequest'] = true;
+                window.TMSHelper.console("[TMSProcessing.setEventTriggerFlag] -> info: onsite links shall be tracked, event_processing_sendRequest set to: " + output['event_processing_sendRequest']);
+              } else if (window.TMSConfig['tmsConfig_event_trackLinkDownload'] && input['event_attributes_isDownload']) {
+                output['event_processing_sendRequest'] = true;
+                window.TMSHelper.console("[TMSProcessing.setEventTriggerFlag] -> info: download links shall be tracked, event_processing_sendRequest set to: " + output['event_processing_sendRequest']);
+              } else if (window.TMSConfig['tmsConfig_event_trackLinkMailto'] && input['event_attributes_isMailto']) {
+                output['event_processing_sendRequest'] = true;
+                window.TMSHelper.console("[TMSProcessing.setEventTriggerFlag] -> info: mailto links shall be tracked, event_processing_sendRequest set to: " + output['event_processing_sendRequest']);
+              } else if (window.TMSConfig['tmsConfig_event_trackLinkPhone'] && input['event_attributes_isPhone']) {
+                output['event_processing_sendRequest'] = true;
+                window.TMSHelper.console("[TMSProcessing.setEventTriggerFlag] -> info: phone links shall be tracked, event_processing_sendRequest set to: " + output['event_processing_sendRequest']);
+              } else if (window.TMSConfig['tmsConfig_event_trackLinkOffsite'] && input['event_attributes_isOnsite'] === false) {
+                  output['event_processing_sendRequest'] = true;
+                  window.TMSHelper.console("[TMSProcessing.setEventTriggerFlag] -> info: offsite links shall be tracked, event_processing_sendRequest set to: " + output['event_processing_sendRequest']);
+              }
+        } else {
+            window.TMSHelper.console("[TMSProcessing.setEventTriggerFlag] -> warning: invalid input");
+        }
+ 
+        window.TMSHelper.console("[TMSProcessing.setEventTriggerFlag] complete");
+        return output;
+    } catch (err) {
+        window.TMSHelper.console("[TMSProcessing.setEventTriggerFlag] error:");
+        window.TMSHelper.errorHandler(err);
+        return input;
+    }
+};
+
+// +++++++++++++++++++++++++++++++++++++++++++++++++++++++
+// 1151 TMSProcessing.setStandardEventVars (VAST)
+// Issued by: Agnosticalyze
+// version: 2.13, 2022-06-01
+// +++++++++++++++++++++++++++++++++++++++++++++++++++++++
+     
+// set event variables according to standard cases (if not already set, e.g. by collectors)
+window.TMSProcessing = window.TMSProcessing || {}; // remove this line if function is included inside a collection wrapper
+window.TMSProcessing.setStandardEventVars = function (input) { // remove this line for including function inside a collection wrapper
+// function setStandardEventVars(input) {  // uncomment this line for including function inside a collection wrapper
+    try {
+        window.TMSHelper.console("[TMSProcessing.setStandardEventVars] start");
+        
+        if (typeof input === "object") {
+            var output = {};
+               
+            // 0 Target URL handling
+            if (typeof input['event_element_tgtUrl_url'] === "string" && typeof window.TMSHelper.URLslasher === "function") {
+                var slashedTgtURL = window.TMSHelper.URLslasher(input['event_element_tgtUrl_url']);
+                output = window.TMSHelper.copyVarsFromObjectToObject({
+                    sourceObject: slashedTgtURL
+                    , mergeObject: output
+                    , targetPrefix: "event_element_tgtUrl_"
+                    , overwrite: false
+                    , harmonize: false
+                    , flatten: false
+                });
+                window.TMSHelper.copyVarsFromObjectToObject({
+                    sourceObject: output
+                    , mergeObject: input
+                    , overwrite: false
+                    , includeFromSource: ["P:event_element_tgtUrl_"]
+                    , inplace: true
+                });
+                window.TMSHelper.console("[TMSProcessing.setStandardEventVars] -> info: event_element_tgtUrl_url set: " + output['event_element_tgtUrl_url']);
+            } else {
+                 window.TMSHelper.console("[TMSProcessing.setStandardEventVars] -> warning: event_element_tgtUrl_url or TMSHelper.URLslasher not defined");
+            }
+               
+            // 1.1 Set default values for unknown (without any details) interactions (will be overwritten during further processing)
+            output['event_category_primaryCategory'] = "not-set";
+            output['event_eventInfo_cause'] = "not-set";
+            output['event_eventInfo_effect'] = "not-set";
+           
+            // 1.2 set default values for event variables
+            if (typeof input['event_element_tgtUrl_url'] === "string") {
+                output['event_category_primaryCategory'] = "navigation";
+                output['event_eventInfo_cause'] = "click";
+                output['event_eventInfo_effect'] = "go-to";
+            }
+               
+            // 1.3 set event label
+            if (typeof input['event_eventInfo_label'] === "string" && input['event_eventInfo_label'] !== "") {
+                output['event_eventInfo_label'] = input['event_eventInfo_label'];
+            } else if (typeof input['event_element_elementInnerText'] === "string" && input['event_element_elementInnerText'] !== "") {
+                output['event_eventInfo_label'] = input['event_element_elementInnerText'];
+            } else if (typeof input['event_element_elementValue'] === "string" && input['event_element_elementValue'] !== "") {
+                output['event_eventInfo_label'] = input['event_element_elementValue'];
+            } else if (typeof input['event_element_elementTitle'] === "string" && input['event_element_elementTitle'] !== "") {
+                output['event_eventInfo_label'] = input['event_element_elementTitle'];
+            } else if (typeof input['event_element_elementName'] === "string" && input['event_element_elementName'] !== "") {
+                output['event_eventInfo_label'] = input['event_element_elementName'];
+            } else if (typeof input['event_element_elementTagName'] === "string" && input['event_element_elementTagName'] !== "") {
+                output['event_eventInfo_label'] = input['event_element_elementTagName'];
+            } else if (typeof input['event_element_elementID'] === "string" && input['event_element_elementID'] !== "") {
+                output['event_eventInfo_label'] = input['event_element_elementID'];
+            } else if (typeof input['event_element_elementClassName'] === "string" && input['event_element_elementClassName'] !== "") {
+                output['event_eventInfo_label'] = input['event_element_elementClassName'];
+            } else if (typeof input['event_element_tgtUrl_url'] === "string" && input['event_element_tgtUrl_url'] !== "") {
+                output['event_eventInfo_label'] = input['event_element_tgtUrl_url'];
+            } else {
+                output['event_eventInfo_label'] = "not-set";
+            }
+               
+            // 2.0 get event flags
+            if (window.TMSProcessing.identifyStandardEventCase && typeof output['event_element_tgtUrl_url'] === "string" && output['event_element_tgtUrl_url'] !== "") {
+                output = window.TMSProcessing.identifyStandardEventCase(output);
+                // merge flags from output into input
+                window.TMSHelper.copyVarsFromObjectToObject({
+                    sourceObject: output,
+                    mergeObject: input,
+                    overwrite: false,
+                    includeFromSource: ["P:event_attributes_is"],
+                    inplace: true
+                });
+            }
+         
+            // 2.1 set variables for "Anchor" case
+            if (typeof input['event_attributes_isAnchor'] === "boolean" && input['event_attributes_isAnchor']) {
+                output['event_category_primaryCategory'] = "content";
+            }
+         
+            // 2.2 set variables for "Offsite" case
+            if (typeof input['event_attributes_isOnsite'] === "boolean" && !input['event_attributes_isOnsite']) {
+                output['event_category_primaryCategory'] = "site-transition";
+                if (typeof input['event_element_tgtUrl_hostnameAndPath'] === "string" && input['event_element_tgtUrl_hostnameAndPath'] !== "") {
+                    output['event_eventInfo_label'] = input['event_element_tgtUrl_hostnameAndPath'];
+                } else if (typeof input['event_element_tgtUrl_url'] === "string" && input['event_element_tgtUrl_url'] !== "") {
+                    output['event_eventInfo_label'] = input['event_element_tgtUrl_url'];
+                } else {
+                    output['event_eventInfo_label'] = "offsite";
+                }
+            }
+         
+            // 2.3 set variables for "Download" case
+            if (typeof input['event_attributes_isDownload'] === "boolean" && input['event_attributes_isDownload']) {
+                output['event_category_primaryCategory'] = "file";
+                output['event_eventInfo_effect'] = "download";
+                if (typeof input['event_element_tgtUrl_hostnameAndPath'] === "string" && input['event_element_tgtUrl_hostnameAndPath'] !== "") {
+                    output['event_eventInfo_label'] = input['event_element_tgtUrl_hostnameAndPath'];
+                } else if (typeof input['event_element_tgtUrl_url'] === "string" && input['event_element_tgtUrl_url'] !== "") {
+                    output['event_eventInfo_label'] = input['event_element_tgtUrl_url'];
+                } else {
+                    output['event_eventInfo_label'] = "download";
+                }
+            }
+         
+            // 2.4 set variables for "Mailto" case
+            if (typeof input['event_attributes_isMailto'] === "boolean" && input['event_attributes_isMailto'] && (typeof input['event_attributes_isSharelink'] === "boolean" && !input['event_attributes_isSharelink'])) {
+                output['event_category_primaryCategory'] = "email";
+                output['event_eventInfo_effect'] = "start";
+                if (typeof input['event_element_tgtUrl_hostname'] === "string" && input['event_element_tgtUrl_hostname'] !== "") {
+                    output['event_eventInfo_label'] = input['event_element_tgtUrl_hostname'];
+                } else if (typeof input['event_element_tgtUrl_url'] === "string" && input['event_element_tgtUrl_url'] !== "") {
+                    output['event_eventInfo_label'] = input['event_element_tgtUrl_url'];
+                } else {
+                    output['event_eventInfo_label'] = "email";
+                }
+            }
+         
+            // 2.5 set variables for "Phone" case
+            if (typeof input['event_attributes_isPhone'] === "boolean" && input['event_attributes_isPhone']) {
+                output['event_category_primaryCategory'] = "phone";
+                output['event_eventInfo_effect'] = "start";
+                if (typeof input['event_element_tgtUrl_hostname'] === "string" && input['event_element_tgtUrl_hostname'] !== "") {
+                    output['event_eventInfo_label'] = input['event_element_tgtUrl_hostname'];
+                } else if (typeof input['event_element_tgtUrl_url'] === "string" && input['event_element_tgtUrl_url'] !== "") {
+                    output['event_eventInfo_label'] = input['event_element_tgtUrl_url'];
+                } else {
+                    output['event_eventInfo_label'] = "phone";
+                }
+            }
+   
+            // 2.6 set variables for "Share Link" case
+            if (typeof input['event_attributes_isSharelink'] === "boolean" && input['event_attributes_isSharelink']) {
+                output['event_category_primaryCategory'] = "share";
+                output['event_eventInfo_effect'] = "go-to";
+                var portal = window.TMSHelper.identifySocialProvider(input['event_element_tgtUrl_url']);
+                if (portal === "email") {
+                    output['event_eventInfo_effect'] = "start";
+                }
+                output['event_eventInfo_label'] = "share-" + portal;
+            }
+               
+            window.TMSHelper.console("[TMSProcessing.setStandardEventVars] complete");
+            return output;
+        } else {
+            window.TMSHelper.console("[TMSProcessing.setStandardEventVars] -> warning: invalid call of function");
+            window.TMSHelper.console("[TMSProcessing.setStandardEventVars] complete");
+            return {};
+        }
+    } catch (err) {
+        window.TMSHelper.console("[TMSProcessing.setStandardEventVars] error:");
+        window.TMSHelper.errorHandler(err);
+        return {};
+    }
+};
+
+// +++++++++++++++++++++++++++++++++++++++++++++++++++++++
+// 1152 TMSProcessing.mapElementElementInfoToEventElementVars
+// Issued by: Agnosticalyze
+// version: 1.0, 2021-07-30
+// +++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+
+ // variable mapping: If element_elementInfo_... was found in elementContent or levelContent collection, map to event_element_...
+ window.TMSProcessing = window.TMSProcessing || {}; // remove this line if function is included inside a collection wrapper
+ window.TMSProcessing.mapElementElementInfoToEventElementVars = function (event) { // remove this line for including function inside a collection wrapper
+ // function mapElementElementInfoToEventElementVars(event) {  // uncomment this line for including function inside a collection wrapper
+  var prefix = new RegExp("element_elementInfo_", "g");
+  for (var oldAttrName in event) {
+      if (oldAttrName.match(prefix)) {
+          newAttrName = oldAttrName.replace(prefix, "event_element_");
+          if (typeof event[newAttrName] === "undefined" || (event[newAttrName] === "" && event[oldAttrName] !== "")) {
+              // set event_element_... variable
+              event[newAttrName] = event[oldAttrName];
+              // remove element_elementInfo_... variable
+              delete event[oldAttrName];
+          } else if (typeof event[newAttrName] !== "undefined" && event[newAttrName] !== "") {
+              // just remove element_elementInfo_... variable, a corresponding event_element_... variable already exists
+              delete event[oldAttrName];
+          }
+      }
+  }
+  return event;
+};
+
+// +++++++++++++++++++++++++++++++++++++++++++++++++++++++
+// 1153 TMSProcessing.setEventElementLocationFromParentLevelNames
+// Issued by: Agnosticalyze
+// version: 1.0, 2021-07-30
+// +++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+
+ // set event_element_location from event_element_parentLevelNames if not already populated
+ window.TMSProcessing = window.TMSProcessing || {}; // remove this line if function is included inside a collection wrapper
+ window.TMSProcessing.setEventElementLocationFromParentLevelNames = function (event) { // remove this line for including function inside a collection wrapper
+ // function setEventElementLocationFromParentLevelNames(event) {  // uncomment this line for including function inside a collection wrapper
+  if ((typeof event['event_element_location'] !== "string" || event['event_element_location'] === "") && typeof event['event_element_parentLevelNames'] === "string" && event['event_element_parentLevelNames'] !== "") {
+    event['event_element_location'] = event['event_element_parentLevelNames'];
+  }
+  return event;
+};
+
+// +++++++++++++++++++++++++++++++++++++++++++++++++++++++
+// 1155 TMSProcessing.setMediaEventVars
+// Issued by: Feld M
+// version: 1.0, 2022-01-18
+// +++++++++++++++++++++++++++++++++++++++++++++++++++++++
+TMSProcessing = TMSProcessing || {}; // remove this line if function is included inside a collection wrapper
+
+
+/**
+ * Sets or transforms UDO variables of media tracking to comply with specification
+ */
+TMSProcessing.setMediaEventVars = function (input) { // remove this line for including function inside a collection wrapper
+   // function setMediaEventVars(input) {  // uncomment this line for including function inside a collection wrapper
+   try {
+      TMSHelper.console("[TMSProcessing.setMediaEventVars] start");
+
+      var output = {};
+
+      // Set/Transform complementary variables for "Media" tracking
+      if (input['event_category_primaryCategory'] === "media") {
+         output['event_eventInfo_label'] = input['content_media_fileTitle'] || input['content_media_fileName'];
+
+         //Format media length if needed
+         if (output['content_media_length'] && !TMSHelper.isHMSFormat(input['content_media_length'])) {
+            output['content_media_length'] = TMSHelper.convertSecToHMS(input['content_media_length']);
+         }
+
+         //Format media position if needed
+         if (!TMSHelper.isHMSFormat(input['event_media_position'])) {
+            output['event_media_position'] = TMSHelper.convertSecToHMS(input['event_media_position']);
+
+         }
+         //Calculate media progress
+         if (input['content_media_length'] && input['event_media_position'] && !input['event_media_progress']) {
+            output['event_media_progress'] = TMSHelper.calculateProgress(input['event_media_position'], input['content_media_length']);
+         }
+      }
+      TMSHelper.console("[TMSProcessing.setMediaEventVars] complete");
+      return output;
+
+   } catch (err) {
+      TMSHelper.console("[TMSProcessing.setMediaEventVars] error:");
+      TMSHelper.errorHandler(err);
+      return output;
+   }
+};
+
+// +++++++++++++++++++++++++++++++++++++++++++++++++++++++
+// 1161 TMSProcessing.dice (trigger TMS event request)
+// Issued by: Agnosticalyze
+// version: 1.14, 2022-06-17
+// +++++++++++++++++++++++++++++++++++++++++++++++++++++++
+  
+// send data to TMS for further processing
+window.TMSProcessing = window.TMSProcessing || {}; // remove this line if function is included inside a collection wrapper
+window.dice = window.TMSProcessing.dice = function (eventRequestObject) {
+  // remove this line for including function inside a collection wrapper
+  // function dice(eventRequestObject) {  // uncomment this line for including function inside a collection wrapper
+  try {
+    window.TMSHelper.console("[TMSProcessing.dice] start");
+  
+    if (
+      typeof eventRequestObject === "object"
+    ) {
+        if (typeof eventRequestObject["event_eventInfo_type"] !== "string" || eventRequestObject["event_eventInfo_type"] === "") {
+            window.TMSHelper.console("[TMSProcessing.dice] -> info: event_eventInfo_type not set, defaulting to 'not-set'");
+            eventRequestObject["event_eventInfo_type"] = "not-set";
+        }
+ 
+        if (typeof eventRequestObject["event_processing_trigger"] !== "string" || eventRequestObject["event_processing_trigger"] === "") {
+            window.TMSHelper.console("[TMSProcessing.dice] -> info: event_processing_trigger not set, defaulting to 'dice'");
+            eventRequestObject["event_processing_trigger"] = "dice";
+        }
+ 
+        if (eventRequestObject["event_eventInfo_type"] === "datalayer-update") {
+            window.TMSHelper.console("[TMSProcessing.dice] -> info: datalayer-update detected");
+            window.TMSEvent = window.TMSHelper.copyVarsFromObjectToObject({
+                  sourceObject: eventRequestObject
+                , mergeObject: {}
+                , overwrite: true
+                , harmonize: false
+            });;
+            window.TMSProcessing.TMSEventOrchestrator();
+        } else if (eventRequestObject["event_eventInfo_type"] === "pageview-physical" || eventRequestObject["event_eventInfo_type"] === "pageview-virtual") {
+            window.TMSHelper.console("[TMSProcessing.dice] -> info: pageview-physical or pageview-virtual detected");
+ 
+            // DTM specific request
+            if (window.TMSConfig["tmsConfig_tool_DTM_flag"]) {
+                window.TMSHelper.console("[TMSProcessing.dice] -> info: sending request to DTM");
+                window.TMSHelper.console("[TMSProcessing.dice] -> warning: DTM CASE NOT BUILT, YET");
+                // TBA
+            }
+ 
+            // GTM specific request
+            if (window.TMSConfig["tmsConfig_tool_GTM_flag"]) {
+                window.TMSHelper.console("[TMSProcessing.dice] -> info: GTM detected -> create TMSEvent and trigger GTM Extension 1201");
+                // create TMSEvent
+                window.TMSEvent = window.TMSHelper.copyVarsFromObjectToObject({
+                      sourceObject: eventRequestObject
+                    , mergeObject: {}
+                    , overwrite: true
+                    , harmonize: false
+                });
+                // trigger GTM Event
+                try {
+                    // get push function (depending on udoNname)
+                    var pushFunction = window.TMSHelper.getVarFromWindowScopedObject(
+                        window.TMSConfig["tmsConfig_udoName"],
+                        "push"
+                    );
+                    // push event to GTM
+                    pushFunction({
+                        event: "Run TMSProcessing.TMSEventOrchestrator",
+                    });
+                } catch (e) {
+                    window.TMSHelper.console("[TMSProcessing.dice] error:");
+                    window.TMSHelper.errorHandler(e);
+                }
+            }
+ 
+            // TiQ specific request
+            if (window.TMSConfig["tmsConfig_tool_TiQ_flag"]) {
+                window.TMSHelper.console("[TMSProcessing.dice] -> info: sending request to TiQ");
+                if (typeof window.utag.view === "function") {
+                    try {
+                        window.utag.view(eventRequestObject);
+                    } catch (e) {
+                        window.TMSHelper.console("[TMSProcessing.dice] error:");
+                        window.TMSHelper.errorHandler(e);
+                    }
+                } else {
+                    window.TMSHelper.console("[TMSProcessing.dice] -> warning: invalid definition of push function, nothing sent to TiQ");
+                }
+            }
+        } else {
+            window.TMSHelper.console("[TMSProcessing.dice] -> info: event detected");
+ 
+            // DTM specific request
+            if (window.TMSConfig["tmsConfig_tool_DTM_flag"]) {
+                window.TMSHelper.console("[TMSProcessing.dice] -> info: sending request to DTM");
+                window.TMSHelper.console("[TMSProcessing.dice] -> warning: DTM CASE NOT BUILT, YET");
+                // TBA
+            }
+ 
+            // GTM specific request
+            if (window.TMSConfig["tmsConfig_tool_GTM_flag"]) {
+                window.TMSHelper.console("[TMSProcessing.dice] -> info: GTM detected -> create TMSEvent and trigger GTM Extension 1201");
+                // create TMSEvent
+                window.TMSEvent = window.TMSHelper.copyVarsFromObjectToObject({
+                      sourceObject: eventRequestObject
+                    , mergeObject: {}
+                    , overwrite: true
+                    , harmonize: false
+                });
+                // trigger GTM Event
+                try {
+                    // get push function (depending on udoNname)
+                    var pushFunction = window.TMSHelper.getVarFromWindowScopedObject(
+                        window.TMSConfig["tmsConfig_udoName"],
+                        "push"
+                    );
+                    // push event to GTM
+                    pushFunction({
+                        event: "Run TMSProcessing.TMSEventOrchestrator",
+                    });
+                } catch (e) {
+                    window.TMSHelper.console("[TMSProcessing.dice] error:");
+                    window.TMSHelper.errorHandler(e);
+                }
+            }
+ 
+            // TiQ specific request
+            if (window.TMSConfig["tmsConfig_tool_TiQ_flag"]) {
+                window.TMSHelper.console("[TMSProcessing.dice] -> info: sending request to TiQ");
+                if (typeof window.utag.link === "function") {
+                    try {
+                        window.utag.link(eventRequestObject);
+                    } catch (e) {
+                        window.TMSHelper.console("[TMSProcessing.dice] error:");
+                        window.TMSHelper.errorHandler(e);
+                    }
+                } else {
+                    window.TMSHelper.console("[TMSProcessing.dice] -> warning: invalid definition of push function, nothing sent to TiQ");
+                }
+            }
+        }
+    } else {
+        window.TMSHelper.console("[TMSProcessing.dice] -> warning: event_eventInfo_type not defined");
+    }
+  
+    window.TMSHelper.console("[TMSProcessing.dice] complete");
+  } catch (err) {
+    window.TMSHelper.console("[TMSProcessing.dice] error:");
+    window.TMSHelper.errorHandler(err);
+  }
+};
+
+// +++++++++++++++++++++++++++++++++++++++++++++++++++++++
+// 1162 TMSProcessing.sendToParentWindow
+// Issued by: Agnosticalyze
+// version: 2.1, 2022-06-03
+// +++++++++++++++++++++++++++++++++++++++++++++++++++++++
+   
+window.TMSProcessing = window.TMSProcessing || {}; // remove this line if function is included inside a collection wrapper
+window.TMSProcessing.sendToParentWindow= function (eventRequestObject) { // remove this line for including function inside a collection wrapper
+// function sendToParentWindow(eventRequestObject) {  // uncomment this line for including function inside a collection wrapper
+    try {
+        window.TMSHelper.console("[TMSProcessing.sendToParentWindow] start");
+  
+        if (typeof eventRequestObject === "object" 
+                && Object.keys(eventRequestObject).length > 0 
+                && window.top !== window 
+                && window.TMSConfig['tmsConfig_embed_sendToParentWindow']) {
+            // send the stringified object to the top-level parent
+            window.top.postMessage(JSON.stringify(eventRequestObject), '*');
+            window.TMSHelper.console("[TMSProcessing.sendToParentWindow] -> info: event data sent to window.top");
+        } else {
+            window.TMSHelper.console("[TMSProcessing.sendToParentWindow] -> warning: eventRequestObject is invalid or empty");
+        }
+  
+        window.TMSHelper.console("[TMSProcessing.sendToParentWindow] complete");
+    } catch (err) {
+        window.TMSHelper.console("[TMSProcessing.sendToParentWindow] error:");
+        window.TMSHelper.errorHandler(err);
+    }
+};
+
+// +++++++++++++++++++++++++++++++++++++++++++++++++++++++
+// 1163 TMSProcessing.TMSEventOrchestrator
+// Issued by: Agnosticalyze
+// version: 1.5, 2022-06-17
+// +++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ 
+// TBA
+window.TMSProcessing = window.TMSProcessing || {}; // remove this line if function is included inside a collection wrapper
+window.TMSProcessing.TMSEventOrchestrator = function () { // remove this line for including function inside a collection wrapper
+// function TMSEventOrchestrator() {  // uncomment this line for including function inside a collection wrapper
+    try {
+        window.TMSHelper.console("[TMSProcessing.TMSEventOrchestrator] start");
+        if (window.TMSEvent['event_processing_trigger'] && window.TMSEvent['event_processing_trigger'].endsWith("_receivedfromchildwindow")) {
+            window.TMSHelper.console("[TMSProcessing.TMSEventOrchestrator] running on iframe data. event orchestration is not needed. skipping");
+            return;
+        }
+ 
+        // 1 Preparation: Copy information
+         
+        if (typeof window.TMSEvent === "object" && Object.keys(window.TMSEvent).length > 0) {
+            // 1.1 Harmonize variables in TMSEvent
+            //     => previously extension 1201
+            window.TMSHelper.console("[TMSProcessing.TMSEventOrchestrator] -> info: TMSEvent is not empty -> harmonize");
+            // harmonize variables and overwrite pre-existing information in TMSEvent
+            window.TMSEvent = window.TMSHelper.copyVarsFromObjectToObject({
+                  sourceObject: window.TMSEvent
+                , mergeObject: {}
+                , overwrite: false
+                , harmonize: true
+            });
+            window.TMSHelper.console("[TMSProcessing.TMSEventOrchestrator] -> info: variables in TMSEvent harmonized");
+        } else {
+            window.TMSHelper.console("[TMSProcessing.TMSEventOrchestrator] -> info: TMSEvent is empty -> copy from VSPO");
+            // 1.2 Copy from vendor-specific processing object to TMSEvent
+            if (window.TMSConfig['tmsConfig_tool_TiQ_flag'] && typeof b === "object") { // TBA: replace b with variable configured in TMSConfig
+                // harmonize variables and overwrite pre-existing information in TMSEvent
+                window.TMSEvent = window.TMSHelper.copyVarsFromObjectToObject({
+                      sourceObject: b // TBA: replace b with variable configured in TMSConfig
+                    , mergeObject: {}
+                    , overwrite: true
+                    , harmonize: true
+                    , excludeFromSource: window.TMSConfig['tmsConfig_processing_toolTealiumVars']
+                });
+            }
+        }
+ 
+        // 1.3 Copy from TMSEvent to TMSConfig
+        //     note: by now, TMSEvent is certainly populated
+        //     => Previously extension 1202
+        if (typeof window.TMSConfig === "object" && typeof window.TMSEvent['event_eventInfo_type'] === "string" && window.TMSEvent['event_eventInfo_type'] !== "datalayer-update") {
+            window.TMSConfig = window.TMSHelper.copyVarsFromObjectToObject({
+                  sourceObject: window.TMSEvent
+                , mergeObject: window.TMSConfig
+                , overwrite: true
+                , harmonize: false
+                , includeFromSource: window.TMSConfig['tmsConfig_processing_persistingConfigVars']
+            });
+        }
+ 
+        // 2 Set default values for event_eventInfo_type and event_processing_trigger
+        if (typeof window.TMSEvent['event_eventInfo_type'] === "string" && window.TMSEvent['event_eventInfo_type'] !== "") {
+            window.TMSHelper.console("[TMSProcessing.TMSEventOrchestrator] -> info: TMSEvent.event_eventInfo_type is already defined and not overwritten by a default value");
+        } else {
+            if (typeof window.TMSCache === "object" && Object.keys(window.TMSCache).length > 0) {
+                if (typeof window.TMSEvent['page_attributes_virtualPageView'] === "string" && window.TMSEvent['page_attributes_virtualPageView'] === "1") {
+                    window.TMSEvent['event_eventInfo_type'] = "pageview-virtual"
+                    window.TMSHelper.console("[TMSProcessing.TMSEventOrchestrator] -> info: TMSEvent.event_eventInfo_type set to 'pageview-virtual'");
+                } else {
+                    window.TMSEvent['event_eventInfo_type'] = "not-set"
+                    window.TMSHelper.console("[TMSProcessing.TMSEventOrchestrator] -> info: TMSEvent.event_eventInfo_type set to 'not-set'");
+                }
+            } else {
+                window.TMSEvent['event_eventInfo_type'] = "pageview-physical"
+                window.TMSHelper.console("[TMSProcessing.TMSEventOrchestrator] -> info: TMSEvent.event_eventInfo_type set to 'pageview-physical'");
+            }
+        }
+        if (typeof window.TMSEvent['event_processing_trigger'] === "string" && window.TMSEvent['event_processing_trigger'] !== "") {
+            window.TMSHelper.console("[TMSProcessing.TMSEventOrchestrator] -> info: TMSEvent.event_processing_trigger is already defined and not overwritten by a default value");
+        } else {
+            window.TMSEvent['event_processing_trigger'] = "not-set"
+            window.TMSHelper.console("[TMSProcessing.TMSEventOrchestrator] -> info: TMSEvent.event_processing_trigger set to 'not-set'");
+        }
+ 
+        // 3 Event Orchestration
+        if (window.TMSEvent['event_eventInfo_type'] === "pageview-physical") {
+            window.TMSHelper.console("[TMSProcessing.TMSEventOrchestrator] -> info: pageview-physical detected");
+            // URL Handling
+            if (window.TMSProcessing.getPageURLWindow)              window.TMSProcessing.getPageURLWindow();            else window.TMSHelper.console("[TMSEvent Orchestrator] -> warning: getPageURLWindow function not defined");
+            if (window.TMSProcessing.getPageURLCanonical)           window.TMSProcessing.getPageURLCanonical();         else window.TMSHelper.console("[TMSEvent Orchestrator] -> warning: getPageURLCanonical function not defined");
+            if (window.TMSProcessing.getPageURLAlternate)           window.TMSProcessing.getPageURLAlternate();         else window.TMSHelper.console("[TMSEvent Orchestrator] -> warning: getPageURLAlternate function not defined");
+            if (window.TMSProcessing.getPageURLInput)               window.TMSProcessing.getPageURLInput();             else window.TMSHelper.console("[TMSEvent Orchestrator] -> warning: getPageURLInput function not defined");
+            // get page name
+            if (window.TMSProcessing.getCurrentPageName)            window.TMSProcessing.getCurrentPageName();          else window.TMSHelper.console("[TMSEvent Orchestrator] -> warning: getCurrentPageName function not defined");
+            // Touchpoint Handling
+            if (window.TMSProcessing.getCurrentTouchpoint)          window.TMSProcessing.getCurrentTouchpoint();        else window.TMSHelper.console("[TMSEvent Orchestrator] -> warning: getCurrentTouchpoint function not defined");
+            if (window.TMSProcessing.touchpointHandler)             window.TMSProcessing.touchpointHandler();           else window.TMSHelper.console("[TMSEvent Orchestrator] -> warning: touchpointHandler function not defined");
+            if (window.TMSProcessing.mapCurrentTouchpointValues)    window.TMSProcessing.mapCurrentTouchpointValues();  else window.TMSHelper.console("[TMSEvent Orchestrator] -> warning: mapCurrentTouchpointValues function not defined");
+            // determine Platform Environment
+            if (window.TMSProcessing.getPlatformEnvironment)        window.TMSProcessing.getPlatformEnvironment();      else window.TMSHelper.console("[TMSEvent Orchestrator] -> warning: getPlatformEnvironment function not defined");
+            // determine, whether the current page is embedded inside another page
+            if (window.TMSProcessing.getEmbedInfo)                  window.TMSProcessing.getEmbedInfo();                else window.TMSHelper.console("[TMSEvent Orchestrator] -> warning: getEmbedInfo function not defined");
+        } else if (window.TMSEvent['event_eventInfo_type'] === "pageview-virtual") {
+            window.TMSHelper.console("[TMSProcessing.TMSEventOrchestrator] -> info: pageview-virtual detected");
+            // URL Handling
+            if (window.TMSProcessing.getPageURLWindow)              window.TMSProcessing.getPageURLWindow();            else window.TMSHelper.console("[TMSEvent Orchestrator] -> warning: getPageURLWindow function not defined");
+            // get page name
+            if (window.TMSProcessing.getCurrentPageName)            window.TMSProcessing.getCurrentPageName();          else window.TMSHelper.console("[TMSEvent Orchestrator] -> warning: getCurrentPageName function not defined");
+            // Touchpoint Handling
+            if (window.TMSProcessing.getCurrentTouchpoint)          window.TMSProcessing.getCurrentTouchpoint();        else window.TMSHelper.console("[TMSEvent Orchestrator] -> warning: getCurrentTouchpoint function not defined");
+            if (window.TMSProcessing.touchpointHandler)             window.TMSProcessing.touchpointHandler();           else window.TMSHelper.console("[TMSEvent Orchestrator] -> warning: touchpointHandler function not defined");
+            if (window.TMSProcessing.mapCurrentTouchpointValues)    window.TMSProcessing.mapCurrentTouchpointValues();  else window.TMSHelper.console("[TMSEvent Orchestrator] -> warning: mapCurrentTouchpointValues function not defined");
+        } else if (window.TMSEvent['event_eventInfo_type'] === "datalayer-update") {
+            window.TMSHelper.console("[TMSProcessing.TMSEventOrchestrator] -> info: datalayer-update detected");
+            // TBD
+        } else {
+            window.TMSHelper.console("[TMSProcessing.TMSEventOrchestrator] -> info: general event detected");
+            if (window.TMSProcessing.mapElementElementInfoToEventElementVars)       window.TMSProcessing.mapElementElementInfoToEventElementVars(window.TMSEvent);       else window.TMSHelper.console("[TMSEvent Orchestrator] -> warning: mapElementElementInfoToEventElementVars function not defined");
+            if (window.TMSProcessing.setEventElementLocationFromParentLevelNames)   window.TMSProcessing.setEventElementLocationFromParentLevelNames(window.TMSEvent);   else window.TMSHelper.console("[TMSEvent Orchestrator] -> warning: setEventElementLocationFromParentLevelNames function not defined");
+            // VAST: set standard event vars
+            if (window.TMSProcessing.setStandardEventVars)                          window.TMSEvent = window.TMSHelper.copyVarsFromObjectToObject({
+                sourceObject: window.TMSProcessing.setStandardEventVars(window.TMSEvent),
+                mergeObject: window.TMSEvent,
+                overwrite: false
+                });
+                else window.TMSHelper.console("[TMSProcessing.TMSEventOrchestrator] -> warning: setStandardEventVars function not defined");
+            // Set complementary media UDO vars
+            if (window.TMSProcessing.setMediaEventVars && TMSEvent['event_category_primaryCategory'] === 'media')   window.TMSEvent = window.TMSHelper.copyVarsFromObjectToObject({
+                        sourceObject: window.TMSProcessing.setMediaEventVars(window.TMSEvent),
+                        mergeObject: window.TMSEvent,
+                        overwrite: true
+                });
+                else window.TMSHelper.console("[TMSProcessing.TMSEventOrchestrator] -> warning: setMediaEventVars function not defined");
+        }
+ 
+        // 4 Finishing up: Copy information
+        // 4.1 Copy from TMSCache to TMSEvent (currently it's the other way around to account for interdependentVars)
+        //     => Previously extension 1221
+        if (typeof window.TMSCache === "object" && Object.keys(window.TMSCache).length > 0) {
+            window.TMSEvent = window.TMSHelper.copyVarsFromObjectToObject({
+                  sourceObject: window.TMSEvent
+                , mergeObject: window.TMSCache
+                , overwrite: true
+                , harmonize: false
+            });
+        } else {
+            window.TMSHelper.console("[TMSProcessing.TMSEventOrchestrator] -> info: TMSCache not found");
+        }
+ 
+        if (window.TMSEvent['event_eventInfo_type'] !== "datalayer-update") {
+            // 4.2 Copy from TMSConfig to processing object
+            //   => Previously extension 1223
+            if (window.TMSConfig['tmsConfig_tool_TiQ_flag'] === true && typeof b === "object") { // TBD: replace with variable configured in TMSConfig
+                window.TMSHelper.copyVarsFromObjectToObject({
+                      sourceObject: window.TMSConfig
+                    , mergeObject: b
+                    , overwrite: true
+                    , harmonize: false
+                    , excludeFromSource: ['P:tmsConfig_processing']
+                    , flatten: false
+                    , inplace: true
+                });
+                window.TMSHelper.console("[TMSProcessing.TMSEventOrchestrator] -> info: variables copied from TMSConfig to vendor-specific processing object");
+            } else {
+                window.TMSEvent = window.TMSHelper.copyVarsFromObjectToObject({
+                      sourceObject: window.TMSConfig
+                    , mergeObject: window.TMSEvent
+                    , overwrite: true
+                    , harmonize: false
+                    , excludeFromSource: ['P:tmsConfig_processing']
+                    , flatten: false
+                });
+                window.TMSHelper.console("[TMSProcessing.TMSEventOrchestrator] -> info: variables copied from TMSConfig to TMSEvent");
+            }
+ 
+            // 4.3 Copy from TMSEvent to processing object
+            //   => Previously extension 1222
+            if (window.TMSConfig['tmsConfig_tool_TiQ_flag'] === true && typeof b === "object") { // TBD: replace with variable configured in TMSConfig
+                window.TMSHelper.copyVarsFromObjectToObject({
+                      sourceObject: window.TMSEvent
+                    , mergeObject: b
+                    , overwrite: true
+                    , harmonize: false
+                    , inplace: true
+                });
+                window.TMSHelper.console("[TMSProcessing.TMSEventOrchestrator] -> info: variables copied from vendor-specific processing object to TMSEvent");
+            } else {
+                window.TMSHelper.console("[TMSProcessing.TMSEventOrchestrator] -> info: TMSEvent ist the processing object, nothing copied");
+            }            
+        } else {
+            // 4.4 Call TMSProcessing.dataLayerSynchronizationOrchestrator in case of dalalayer-update
+            window.TMSProcessing.dataLayerSynchronizationOrchestrator();
+        }
+      
+        window.TMSHelper.console("[TMSProcessing.TMSEventOrchestrator] complete");
+    } catch (err) {
+        window.TMSHelper.console("[TMSProcessing.TMSEventOrchestrator] error:");
+        window.TMSHelper.errorHandler(err);
+    }
+};
+
+// +++++++++++++++++++++++++++++++++++++++++++++++++++++++
+// 1164 TMSProcessing.dataLayerSynchronizationOrchestrator
+// Issued by: Agnosticalyze
+// version: 2.4, 2022-06-02
+// +++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    
+// Copies variables as defined in TMSConfig from processing object to TMSConfig and TMSCache depending on recognized case
+window.TMSProcessing = window.TMSProcessing || {}; // remove this line if function is included inside a collection wrapper
+window.TMSProcessing.dataLayerSynchronizationOrchestrator = function () { // remove this line for including function inside a collection wrapper
+// function DataLayerSynchronizationOrchestrator() {  // uncomment this line for including function inside a collection wrapper
+    try {
+        window.TMSHelper.console("[TMSProcessing.dataLayerSynchronizationOrchestrator] start");
+    
+        if (typeof window.TMSEvent === "object" && typeof window.TMSConfig === "object") {
+                if (typeof window.TMSEvent['event_processing_trigger'] === "string" && window.TMSEvent.event_processing_trigger.endsWith("_receivedfromchildwindow")) {
+                    window.TMSHelper.console("[TMSProcessing.dataLayerSynchronizationOrchestrator] -> info: trigger suffix 'receivedfromchildwindow' detected, no synchronization performed");
+                } else {
+                    window.TMSHelper.console("[TMSProcessing.dataLayerSynchronizationOrchestrator] -> info: other trigger than 'receivedfromchildwindow' detected");
+    
+                    // Copy from processing object to TMSConfig (All cases)
+                    // previously extension 4992
+                    window.TMSConfig = window.TMSHelper.copyVarsFromObjectToObject({
+                          sourceObject: window.TMSEvent
+                        , mergeObject: window.TMSConfig
+                        , targetPrefix: ""
+                        , overwrite: true
+                        , harmonize: false
+                        , includeFromSource: window.TMSConfig['tmsConfig_processing_persistingConfigVars']
+                    });
+    
+                    // Copy from processing object to TMSCache (case-specific)
+                    // previously extension 4991
+                    // case: PV-P and datalayer-update
+                    if (window.TMSEvent['event_eventInfo_type'] == "pageview-physical" || window.TMSEvent['event_eventInfo_type'] == "datalayer-update") {
+                        window.TMSCache = window.TMSHelper.copyVarsFromObjectToObject({
+                              sourceObject: window.TMSEvent
+                            , mergeObject: window.TMSCache
+                            , targetPrefix: ""
+                            , overwrite: true
+                            , harmonize: false
+                            , includeFromSource: window.TMSConfig['tmsConfig_processing_persistingCacheVars']
+                        });
+                    }
+                    // case: PV-V
+                    else if (window.TMSEvent['event_eventInfo_type'] == "pageview-virtual") {
+                        window.TMSCache = window.TMSHelper.copyVarsFromObjectToObject({
+                              sourceObject: window.TMSEvent
+                            , mergeObject: window.TMSCache
+                            , targetPrefix: ""
+                            , overwrite: true
+                            , harmonize: false
+                            , includeFromSource: window.TMSConfig['tmsConfig_processing_persistingCacheVars']
+                        });
+                    }
+                    // case: all other (= "events")
+                    else {
+                        window.TMSCache = window.TMSHelper.copyVarsFromObjectToObject({
+                              sourceObject: window.TMSEvent
+                            , mergeObject: window.TMSCache
+                            , targetPrefix: ""
+                            , overwrite: true
+                            , harmonize: false
+                            , includeFromSource: window.TMSConfig['tmsConfig_processing_persistingEventVars']
+                        });
+                    }
+                }
+    
+            window.TMSEvent = {};
+    
+        } else {
+            window.TMSHelper.console("[TMSProcessing.dataLayerSynchronizationOrchestrator] -> warning: TMSEvent or TMSConfig is not defined");
+        }
+    
+        window.TMSHelper.console("[TMSProcessing.dataLayerSynchronizationOrchestrator] complete");
+    } catch (err) {
+        window.TMSHelper.console("[TMSProcessing.dataLayerSynchronizationOrchestrator] error:");
+        window.TMSHelper.errorHandler(err);
+    }
+};
+
+// +++++++++++++++++++++++++++++++++++++++++++++++++++++++
+// 1171 TMSProcessing.obfuscateParameters
+// Issued by: Agnosticalyze
+// version: 1.5, 2022-06-21
+// +++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ 
+// replaces email addresses found in predefined variables with generic value
+window.TMSProcessing = window.TMSProcessing || {}; // remove this line if function is included inside a collection wrapper
+window.TMSProcessing.obfuscateParameters = function (inputObject) {
+    // remove this line for including function inside a collection wrapper
+    // function obfuscateParameters(inputObject) {  // uncomment this line for including function inside a collection wrapper
+    try {
+        window.TMSHelper.console("[TMSProcessing.obfuscateParameters] start");
+ 
+        if (typeof inputObject === "object") {
+            if (
+                (window.TMSConfig.tmsConfig_processing_obfuscate_maskEmail ||
+                    window.TMSConfig
+                        .tmsConfig_processing_obfuscate_maskUnknownParameters) &&
+                typeof window.TMSConfig.tmsConfig_processing_obfuscate_varsToScan ===
+                    "object" &&
+                window.TMSConfig.tmsConfig_processing_obfuscate_varsToScan.length > 0
+            ) {
+                for (var v in window.TMSConfig
+                    .tmsConfig_processing_obfuscate_varsToScan) {
+                    v = window.TMSConfig.tmsConfig_processing_obfuscate_varsToScan[v];
+                    if (typeof inputObject[v] === "undefined") {
+                        // variable not present in inputObject
+                        window.TMSHelper.console(
+                            "[TMSProcessing.obfuscateParameters] info -> inputObject." +
+                                v +
+                                " is not defined"
+                        );
+                    } else {
+                        window.TMSHelper.console(
+                            "[TMSProcessing.obfuscateParameters] info -> masking inputObject." +
+                                v
+                        );
+                        var varToMask = window.TMSHelper.decodeURI(inputObject[v]);
+                        if (window.TMSConfig.tmsConfig_processing_obfuscate_maskEmail) {
+                            inputObject[v] = window.TMSHelper.maskEmails(varToMask);
+                        }
+                        if (
+                            window.TMSConfig
+                                .tmsConfig_processing_obfuscate_maskUnknownParameters &&
+                            !window.TMSConfig
+                                .tmsConfig_processing_obfuscate_removeUnknownParameters
+                        ) {
+                            inputObject[v] =
+                                window.TMSHelper.maskUnknownParameters(varToMask);
+                        } else if (
+                            window.TMSConfig
+                                .tmsConfig_processing_obfuscate_removeUnknownParameters
+                        ) {
+                            inputObject[v] =
+                                window.TMSHelper.removeUnknownParameters(varToMask);
+                        }
+                    }
+                }
+            } else {
+                window.TMSHelper.console(
+                    "[TMSProcessing.obfuscateParameters] warning -> TMSConfig.tmsConfig_processing_obfuscate_varsToScan is not defined or neither mask-flag set"
+                );
+            }
+        } else {
+            window.TMSHelper.console(
+                "[TMSProcessing.obfuscateParameters] warning -> inputObject invalid"
+            );
+        }
+ 
+        window.TMSHelper.console("[TMSProcessing.obfuscateParameters] complete");
+    } catch (error) {
+        TMSHelper.console("[TMSProcessing.obfuscateParameters] error: ");
+        TMSHelper.errorHandler(error);
+    }
+};
