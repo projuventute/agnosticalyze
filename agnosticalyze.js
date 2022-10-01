@@ -2505,3 +2505,108 @@ function calculateProgress(currentPosition, totalDuration) {
 }
 	
 })()
+
+// +++++++++++++++++++++++++++++++++++++++++++++++++++++++
+// 0201 TMSConfig Create
+// Issued by: Agnosticalyze
+// version: 1.0, 2021-03-11
+// +++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+// Creates TMSConfig object if not yet available
+window.TMSConfig = window.TMSConfig || [];
+
+// +++++++++++++++++++++++++++++++++++++++++++++++++++++++
+// 0211 TMSConfig.tmsConfig_isConsoleEnabled
+// Issued by: Agnosticalyze
+// version: 2.0, 2021-02-15
+// +++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+// Init function to enable console
+try {
+    if (typeof window.TMSConfig !== "undefined") {
+        if (typeof window.TMSHelper.getVarFromString(window.location.search, "console") !== "undefined" && window.TMSHelper.getVarFromString(window.location.search, "console") !== null) {
+            // Read query parameter value => Master Switch
+            if (decodeURIComponent(window.TMSHelper.getVarFromString(window.location.search, "console")) === "true" || decodeURIComponent(window.TMSHelper.getVarFromString(window.location.search, "console")) === "1" || decodeURIComponent(window.TMSHelper.getVarFromString(window.location.search, "console")) === "on") {
+                window.TMSConfig['tmsConfig_isConsoleEnabled'] = true;
+                window.TMSHelper.cookieCreate("TMSActivateConsole", "true", 1);
+                window.TMSHelper.console("[TMSConfig.tmsConfig_isConsoleEnabled] -> info: console enabled via query string, cookie set");
+            } else {
+                window.TMSConfig['tmsConfig_isConsoleEnabled'] = false;
+                window.TMSHelper.cookieCreate("TMSActivateConsole", "false", 1);
+                // window.TMSHelper.console("[TMSConfig.tmsConfig_isConsoleEnabled] -> info: console disabled, cookie set");
+            }
+        } else if (typeof window.TMSConfig['tmsConfig_isConsoleEnabled'] !== "undefined" && window.TMSConfig['tmsConfig_isConsoleEnabled'] !== null) {
+            // JS Variable is already defined (via TMS or DEV)
+            if (window.TMSConfig['tmsConfig_isConsoleEnabled'] === true || window.TMSConfig['tmsConfig_isConsoleEnabled'] === 1 || window.TMSConfig['tmsConfig_isConsoleEnabled'] === "on") {
+                window.TMSConfig['tmsConfig_isConsoleEnabled'] = true;
+                window.TMSHelper.console("[TMSConfig.tmsConfig_isConsoleEnabled] -> info: console enabled via JS variable");
+            } else {
+                window.TMSConfig['tmsConfig_isConsoleEnabled'] = false;
+                // window.TMSHelper.console("[TMSConfig.tmsConfig_isConsoleEnabled] -> info: console disabled");
+            }
+        } else if (window.TMSHelper.cookieRead('TMSActivateConsole') !== null) {
+            // Read cookie value
+            if (window.TMSHelper.cookieRead('TMSActivateConsole') === "true" || window.TMSHelper.cookieRead('TMSActivateConsole') === "1" || window.TMSHelper.cookieRead('TMSActivateConsole') === "on") {
+                window.TMSConfig['tmsConfig_isConsoleEnabled'] = true;
+                window.TMSHelper.cookieCreate("TMSActivateConsole", "true", 1);
+                window.TMSHelper.console("[TMSConfig.tmsConfig_isConsoleEnabled] -> info: console enabled via cookie, cookie updated");
+            } else {
+                window.TMSConfig['tmsConfig_isConsoleEnabled'] = false;
+                // window.TMSHelper.console("[TMSConfig.tmsConfig_isConsoleEnabled] -> info: console disabled");
+            }
+        } else {
+            window.TMSConfig['tmsConfig_isConsoleEnabled'] = false;
+        }
+    }
+} catch (err) {
+    window.console.error(err);
+};
+
+// +++++++++++++++++++++++++++++++++++++++++++++++++++++++
+// 0212 TMSConfig.isErrorLogEnabled
+// Issued by: Agnosticalyze
+// version: 1.0.2, 2021-07-05
+// +++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ 
+// Init function to enable error log
+try {
+    window.TMSHelper.console("[TMSConfig.tmsConfig_isErrorLogEnabled] start");
+  
+    if (typeof window.TMSConfig !== "undefined") {
+        if (typeof window.TMSConfig['tmsConfig_isErrorLogEnabled'] !== "undefined") {
+            // JS Variable is already defined (via TMS or DEV)
+            if (window.TMSConfig['tmsConfig_isErrorLogEnabled'] === false || window.TMSConfig['tmsConfig_isErrorLogEnabled'] === 0 || window.TMSConfig['tmsConfig_isErrorLogEnabled'] === "off") {
+                window.TMSConfig['tmsConfig_isErrorLogEnabled'] = false;
+                window.TMSHelper.console("[TMSConfig.tmsConfig_isErrorLogEnabled] -> info: error log disabled via JS variable");
+            } else {
+                window.TMSConfig['tmsConfig_isErrorLogEnabled'] = true;
+                window.TMSHelper.console("[TMSConfig.tmsConfig_isErrorLogEnabled] -> info: error log enabled");
+            }
+        } else {
+            window.TMSConfig['tmsConfig_isErrorLogEnabled'] = true;
+            window.TMSHelper.console("[TMSConfig.tmsConfig_isErrorLogEnabled] -> info: error log enabled (no value configured)");
+        }
+    }
+  
+    window.TMSHelper.console("[TMSConfig.tmsConfig_isErrorLogEnabled] complete");
+} catch (err) {
+    window.console.error(err);
+};
+
+// +++++++++++++++++++++++++++++++++++++++++++++++++++++++
+// 0221 TMSConfig.tmsConfig_udoName
+// Issued by: Agnosticalyze
+// version: 1.1, 2022-05-16
+// +++++++++++++++++++++++++++++++++++++++++++++++++++++++
+  
+// Set name of identified UDO in TMSConfig if (typeof window.TMSConfig !== "undefined") {
+if (typeof window.TMSConfig['tmsConfig_udoName'] === "undefined" || window.TMSConfig['tmsConfig_udoName'] === null || window.TMSConfig['tmsConfig_udoName'] === "") {
+    if (typeof window.digitalData === "object") {
+        window.TMSConfig['tmsConfig_udoName'] = "digitalData";
+    } else if (typeof window.utag_data === "object") {
+        window.TMSConfig['tmsConfig_udoName'] = "utag_data";
+    } else if (typeof window.dataLayer === "object") {
+        window.TMSConfig['tmsConfig_udoName'] = "dataLayer";
+    }
+};
+
