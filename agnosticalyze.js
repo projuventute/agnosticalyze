@@ -2610,3 +2610,982 @@ if (typeof window.TMSConfig['tmsConfig_udoName'] === "undefined" || window.TMSCo
     }
 };
 
+// +++++++++++++++++++++++++++++++++++++++++++++++++++++++
+// 0401 TMSEvent: copy from UDO
+// Issued by: Agnosticalyze
+// version: 1.3, 2021-03-13
+// +++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ 
+// Populate TMSEvent object if available
+try {
+    window.TMSHelper.console("[TMSEvent.copy] start");
+   
+    window.TMSEvent = window.TMSEvent || {};
+ 
+    if (typeof window.TMSConfig['tmsConfig_udoName'] === "string") {
+        // get information from UDO
+        window.TMSEvent = window.TMSHelper.copyVarsFromObjectToObject({
+              sourceObject: window[TMSConfig['tmsConfig_udoName']]
+            , mergeObject: window.TMSEvent
+            , targetPrefix: ""
+            , overwrite: true
+            , harmonize: false // TMSConfig.tmsConfig_dataLayerHarmonizationLookup is not available at this point in time
+            , includeFromSource: false
+            , excludeFromSource: false
+            , includeFromMerge: false
+            , excludeFromMerge: false
+            , flatten: true
+        });
+ 
+        window.TMSHelper.console("[TMSEvent.copy] -> info: information copied from " + window.TMSConfig['tmsConfig_udoName'] + " to TMSEvent");
+    } else {
+        // no DEV defined object identified => warning
+        window.TMSHelper.console("[TMSEvent.copy] -> warning: no UDO identified");
+    }
+   
+    window.TMSHelper.console("[TMSEvent.copy] complete");
+} catch (err) {
+    // error handler
+    window.TMSHelper.console("[TMSEvent.copy] error:");
+    window.TMSHelper.errorHandler(err);
+};
+
+// +++++++++++++++++++++++++++++++++++++++++++++++++++++++
+// 1001 TMSConfig.tmsConfig_processing_dataLayerHarmonizationLookup
+// Issued by: Agnosticalyze
+// version: 1.2, 2021-03-11
+// +++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ 
+// Set list of dataLayerHarmonizationLookup variables
+try {
+    // window.TMSHelper.console("[TMSConfig.tmsConfig_processing_dataLayerHarmonizationLookup] start");
+   
+    if (typeof window.TMSConfig === "object") {
+        if (typeof window.TMSConfig['tmsConfig_processing_dataLayerHarmonizationLookup'] === "undefined" || window.TMSConfig['tmsConfig_processing_dataLayerHarmonizationLookup'] === null) {
+            window.TMSConfig['tmsConfig_processing_dataLayerHarmonizationLookup'] = {
+                // page url variables
+                "page_url_canonical_url" : ["page_attributes_canonicalURL"]
+                , "page_url_canonical_hostname" : ["page_attributes_canonicalURLhostname"]
+                , "page_url_canonical_path" : ["page_attributes_canonicalURLpath"]
+                , "page_url_canonical_queryString" : ["page_attributes_canonicalURLqueryString"]
+                , "page_url_canonical_fragmentIdentifier" : ["page_attributes_canonicalURLfragmentIdentifier"]
+                , "page_url_window_url" : ["page_attributes_URL"]
+                , "page_url_window_hostname" : ["page_attributes_URLhostname", "page_url_hostname", "url_hostname"]
+                , "page_url_window_path" : ["page_attributes_URLpath", "page_url_path"]
+                , "page_url_window_queryString" : ["page_attributes_URLqueryString", "page_url_query"]
+                , "page_url_window_fragmentIdentifier" : ["page_attributes_URLfragmentIdentifier"]
+                // event variables
+                , "element_elementInfo_location" : ["event_attributes_loc"]
+                , "event_element_tgtUrl_url" : ["event_attributes_tgtURL"]
+                , "event_element_tgtUrl_hostname" : ["event_attributes_tgtURLhostname"]
+                , "event_element_tgtUrl_path" : ["event_attributes_tgtURLpath"]
+            };
+        } else {
+            // Already found a list => warning
+            window.TMSHelper.console("[TMSConfig.tmsConfig_processing_dataLayerHarmonizationLookup] -> warning: List of harmonization variables already identified - value not overwritten");
+        }
+    }
+   
+    // window.TMSHelper.console("[TMSConfig.tmsConfig_processing_dataLayerHarmonizationLookup] complete");
+} catch (err) {
+    // error handler
+    window.TMSHelper.console("[TMSConfig.tmsConfig_processing_dataLayerHarmonizationLookup] error:");
+    window.TMSHelper.errorHandler(err);
+};
+
+// +++++++++++++++++++++++++++++++++++++++++++++++++++++++
+// 1011 TMSConfig.tmsConfig_processing_interdependentVars
+// Issued by: Agnosticalyze
+// version: 1.2, 2021-05-26
+// +++++++++++++++++++++++++++++++++++++++++++++++++++++++
+  
+// Set list of interdependent variables
+try {
+    // window.TMSHelper.console("[TMSConfig.tmsConfig_processing_interdependentVars] start");
+    
+    if (typeof window.TMSConfig === "object") {
+        if (typeof window.TMSConfig['tmsConfig_processing_interdependentVars'] === "undefined" || window.TMSConfig['tmsConfig_processing_interdependentVars'] === null) {
+            window.TMSConfig['tmsConfig_processing_interdependentVars'] = {
+                // page url alternate
+                  "page_url_alternate_url" : "page_url_canonical_url"
+                , "page_url_alternate_protocol" : "page_url_alternate_url"
+                , "page_url_alternate_hostname" : "page_url_alternate_url"
+                , "page_url_alternate_path" : "page_url_alternate_url"
+                , "page_url_alternate_queryString" : "page_url_alternate_url"
+                , "page_url_alternate_fragmentIdentifier" : "page_url_alternate_url"
+                , "page_url_alternate_hostnameAndPath" : "page_url_alternate_url"
+                // page url canonical
+                , "page_url_canonical_url" : "page_url_canonical_url"
+                , "page_url_canonical_protocol" : "page_url_canonical_url"
+                , "page_url_canonical_hostname" : "page_url_canonical_url"
+                , "page_url_canonical_path" : "page_url_canonical_url"
+                , "page_url_canonical_queryString" : "page_url_canonical_url"
+                , "page_url_canonical_fragmentIdentifier" : "page_url_canonical_url"
+                , "page_url_canonical_hostnameAndPath" : "page_url_canonical_url"
+                // page url window
+                , "page_url_window_url" : "page_url_window_url"
+                , "page_url_window_protocol" : "page_url_window_url"
+                , "page_url_window_hostname" : "page_url_window_url"
+                , "page_url_window_path" : "page_url_window_url"
+                , "page_url_window_queryString" : "page_url_window_url"
+                , "page_url_window_fragmentIdentifier" : "page_url_window_url"
+                , "page_url_window_hostnameAndPath" : "page_url_window_url"
+                // page category
+                , "page_category_primaryCategory" : "page_category_primaryCategory"
+                , "page_category_subCategory1" : "page_category_primaryCategory"
+                , "page_category_subCategory2" : "page_category_primaryCategory"
+                , "page_category_subCategory3" : "page_category_primaryCategory"
+                , "page_category_subCategory4" : "page_category_primaryCategory"
+                , "page_category_subCategory5" : "page_category_primaryCategory"
+                , "page_category_subCategory6" : "page_category_primaryCategory"
+                , "page_category_subCategory7" : "page_category_primaryCategory"
+            };
+        } else {
+            // Already found a list => warning
+            window.TMSHelper.console("[TMSConfig.tmsConfig_processing_interdependentVars] -> warning: List of interdependent variables already identified - value not overwritten");
+        }
+    }
+    
+    // window.TMSHelper.console("[TMSConfig.tmsConfig_processing_interdependentVars] complete");
+} catch (err) {
+    // error handler
+    window.TMSHelper.console("[TMSConfig.tmsConfig_processing_interdependentVars] error:");
+    window.TMSHelper.errorHandler(err);
+};
+
+// +++++++++++++++++++++++++++++++++++++++++++++++++++++++
+// 1021 TMSConfig.tmsConfig_processing_persistingConfigVars
+// Issued by: Agnosticalyze
+// version: 1.4, 2022-02-25
+// +++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+// Define variables of which the value should be persisted in TMSConfig
+try {
+	if (typeof window.TMSConfig === "object") {
+		if (typeof window.TMSConfig['tmsConfig_processing_persistingConfigVars'] === "undefined") {
+			window.TMSConfig['tmsConfig_processing_persistingConfigVars'] = [
+				// variables
+				  'P:privacy_consentCategory_'
+				, 'P:tmsConfig_'
+
+			];
+		} else {
+			window.TMSHelper.console("[TMSConfig.tmsConfig_processing_persistingConfigVars] -> warning: Did not overwrite pre-existing TMSConfig[tmsConfig_processing_persistingConfigVars]");
+		}
+	}
+} catch (err) {
+	window.TMSHelper.console("[TMSConfig.tmsConfig_processing_persistingConfigVars] error:");
+	window.TMSHelper.errorHandler(err);
+};
+
+// +++++++++++++++++++++++++++++++++++++++++++++++++++++++
+// 1022 TMSConfig.tmsConfig_processing_persistingCacheVars
+// Issued by: Agnosticalyze
+// version: 1.3, 2021-05-26
+// +++++++++++++++++++++++++++++++++++++++++++++++++++++++
+  
+// Define variables of which the value should be persisted in TMSCache on events/VPVs
+try {
+    if (typeof window.TMSConfig === "object") {
+        if (typeof window.TMSConfig['tmsConfig_processing_persistingCacheVars'] === "undefined") {
+            window.TMSConfig['tmsConfig_processing_persistingCacheVars'] = [
+                // content attributes
+                 'P:content_attributes_'
+                , 'P:content_contentInfo_'
+                // embed information
+                , 'embed_embedInfo_embedType'
+                // page attributes
+                , 'P:page_url_'
+                , 'P:page_category_'
+                , 'P:page_pageInfo_'
+                // platform information
+                , 'P:platform_platformInfo_'
+                // touchpoint
+                , 'P:touchpoint_point_first_'
+                , 'P:touchpoint_point_latest_'
+                , 'P:touchpoint_path_intermediate_'
+                , 'P:touchpoint_path_full_'
+                // user
+                , 'P:user_profile_profileInfo_'
+            ];
+        } else {
+            window.tmsHelper.console("[TMSConfig.tmsConfig_processing_persistingCacheVars] -> warning: Did not overwrite pre-existing TMSConfig[tmsConfig_processing_persistingCacheVars]");
+        }
+    }
+} catch (err) {
+    window.tmsHelper.console("[TMSConfig.tmsConfig_processing_persistingCacheVars] error:");
+    window.tmsHelper.errorHandler(err);
+};
+
+// +++++++++++++++++++++++++++++++++++++++++++++++++++++++
+// 1023 TMSConfig.tmsConfig_processing_persistingEventVars
+// Issued by: Agnosticalyze
+// version: 1.1, 2022-02-25
+// +++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ 
+// Define variables of which the value should be persisted in TMSCache on events/VPVs
+try {
+  if (typeof window.TMSConfig === "object") {
+      if (typeof window.TMSConfig['tmsConfig_processing_persistingEventVars'] === "undefined") {
+          window.TMSConfig['tmsConfig_processing_persistingEventVars'] = [
+              // content attributes
+               'P:content_attributes_'
+              , 'P:content_contentInfo_'
+              // platform information
+              , 'P:platform_platformInfo_'
+              // touchpoint
+              , 'P:touchpoint_point_first_'
+              , 'P:touchpoint_point_latest_'
+              , 'P:touchpoint_path_intermediate_'
+              , 'P:touchpoint_path_full_'
+              // user
+              , 'P:user_profile_profileInfo_'
+          ];
+      } else {
+          window.TMSHelper.console("[TMSConfig.tmsConfig_processing_persistingEventVars] -> warning: Did not overwrite pre-existing TMSConfig[tmsConfig_processing_persistingEventVars]");
+      }
+  }
+} catch (err) {
+  window.TMSHelper.console("[TMSConfig.tmsConfig_processing_persistingEventVars] error:");
+  window.TMSHelper.errorHandler(err);
+};
+
+// +++++++++++++++++++++++++++++++++++++++++++++++++++++++
+// 1031 TMSConfig.tmsConfig_processing_touchpointAttributes
+// Issued by: Agnosticalyze
+// version: 1.2, 2022-02-25
+// +++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+// Define the attributes that will be scanned to (eventually) find the current touchpoint in
+try {
+    if (typeof window.TMSConfig === "object") {
+        if (typeof window.TMSConfig['tmsConfig_processing_touchpointAttributes'] === "undefined") {
+            window.TMSConfig['tmsConfig_processing_touchpointAttributes'] = [
+                  'page_url_window_queryString'
+                , 'page_url_input_url'
+                , 'page_url_marketing_url'
+            ];
+        } else {
+            window.TMSHelper.console("[TMSConfig.tmsConfig_processing_touchpointAttributes] -> warning: Did not overwrite pre-existing TMSConfig[tmsConfig_processing_touchpointAttributes]");
+        }
+    }
+} catch (err) {
+    window.TMSHelper.console("[TMSConfig.tmsConfig_processing_touchpointAttributes] error:");
+    window.TMSHelper.errorHandler(err);
+};
+
+// +++++++++++++++++++++++++++++++++++++++++++++++++++++++
+// 1032 TMSConfig.tmsConfig_processing_touchpointParameters
+// Issued by: Agnosticalyze
+// version: 1.2, 2022-02-25
+// +++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+// Define the query string parameters that will be scanned for to (eventually) find the current touchpoint in
+try {
+    if (typeof window.TMSConfig === "object") {
+        if (typeof window.TMSConfig['tmsConfig_processing_touchpointParameters'] === "undefined") {
+            window.TMSConfig['tmsConfig_processing_touchpointParameters'] = [
+                  "sourceid"
+                , "WT.mc_id"
+                , "gclid"
+                , "utm_id"
+                , "utm_source"
+                , "utm_medium"
+                , "utm_campaign"
+                , "utm_term"
+                , "utm_content"
+            ];
+        } else {
+            window.TMSHelper.console("[TMSConfig.tmsConfig_processing_touchpointParameters] -> warning: Did not overwrite pre-existing TMSConfig[tmsConfig_processing_touchpointParameters]");
+        }
+    }
+} catch (err) {
+    window.TMSHelper.console("[TMSConfig.tmsConfig_processing_touchpointParameters] error:");
+    window.TMSHelper.errorHandler(err);
+};
+
+// +++++++++++++++++++++++++++++++++++++++++++++++++++++++
+// 1033 TMSConfig.tmsConfig_processing_touchpointDelimiters
+// Issued by: Agnosticalyze
+// version: 1.0, 2022-02-25
+// +++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ 
+// Define the delimiters that will be used for processing
+try {
+    if (typeof window.TMSConfig === "object") {
+        if (typeof window.TMSConfig['tmsConfig_processing_touchpointDelimiters'] === "undefined") {
+            window.TMSConfig['tmsConfig_processing_touchpointDelimiters'] = {
+                      "prefix" : "::"
+                    , "component" : ";;"
+                    , "value" : "~"
+                }
+        } else {
+            window.TMSHelper.console("[TMSConfig.tmsConfig_processing_touchpointDelimiters] -> warning: Did not overwrite pre-existing TMSConfig[tmsConfig_processing_touchpointDelimiters]");
+        }
+    }
+} catch (err) {
+    window.TMSHelper.console("[TMSConfig.tmsConfig_processing_touchpointDelimiters] error:");
+    window.TMSHelper.errorHandler(err);
+};
+
+// +++++++++++++++++++++++++++++++++++++++++++++++++++++++
+// 1034 TMSConfig.tmsConfig_processing_touchpointComponents
+// Issued by: Agnosticalyze
+// version: 1.0, 2022-02-25
+// +++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ 
+// Define the components that will be scanned
+try {
+    if (typeof window.TMSConfig === "object") {
+        if (typeof window.TMSConfig['tmsConfig_processing_touchpointComponents'] === "undefined") {
+            window.TMSConfig['tmsConfig_processing_touchpointComponents'] = {
+                      "rqs" : "touchpoint_point_current_touchpointInfo_requester"
+                    , "lng" : "touchpoint_point_current_touchpointInfo_language"
+                    , "chn" : "touchpoint_point_current_marketingActivity_channelName"
+                    , "mdl" : "touchpoint_point_current_marketingActivity_pricingModel"
+                    , "man" : "touchpoint_point_current_marketingActivity_primaryTitle"
+                    , "prt" : "touchpoint_point_current_marketingActivity_promotionType"
+                    , "aud" : "touchpoint_point_current_marketingActivity_targetAudience"
+                    , "ptn" : "touchpoint_point_current_referrer_partner"
+                    , "pbl" : "touchpoint_point_current_referrer_publisher"
+                }
+        } else {
+            window.TMSHelper.console("[TMSConfig.tmsConfig_processing_touchpointComponents] -> warning: Did not overwrite pre-existing TMSConfig[tmsConfig_processing_touchpointComponents]");
+        }
+    }
+} catch (err) {
+    window.TMSHelper.console("[TMSConfig.tmsConfig_processing_touchpointComponents] error:");
+    window.TMSHelper.errorHandler(err);
+};
+
+// +++++++++++++++++++++++++++++++++++++++++++++++++++++++
+// 1041 TMSConfig.tmsConfig_tmsList
+// Issued by: Agnosticalyze
+// version: 1.1, 2021-02-15
+// +++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ 
+// Define relevant TMS and provide tool-specific regex to match script source URLs against
+try {
+    if (typeof window.TMSConfig === "object") {
+        if (typeof window.TMSConfig['tmsConfig_tmsList'] === "undefined") {
+            window.TMSConfig['tmsConfig_tmsList'] = {
+                // Adobe DTM
+                'DTM': ".*assets\.adobedtm\.com.*satelliteLib-.*\.js",
+                // Google GTM
+                'GTM': ".*googletagmanager\.com.*gtm\.js",
+                // Tealium TiQ
+                'TiQ': ".*tags\.tiqcdn\.com\/utag.*utag.*\.js"
+            };
+        } else {
+            window.TMSHelper.console("[TMSConfig.tmsConfig_tmsList] -> warning: Did not overwrite pre-existing TMSConfig[tmsConfig_tmsList]");
+        }
+    }
+} catch (err) {
+    window.TMSHelper.console("[TMSConfig.tmsConfig_tmsList] error:");
+    window.TMSHelper.errorHandler(err);
+};
+
+// +++++++++++++++++++++++++++++++++++++++++++++++++++++++
+// 1042 TMSConfig.identifyTMS
+// Issued by: Agnosticalyze
+// version: 1.1.1, 2021-05-25
+// +++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    
+// Function to determine tool-specific variables for tool and environment identification, store it to declared variables
+try {
+    window.TMSHelper.console("[TMSConfig.identifyTMS] start");
+    if (typeof window.TMSConfig === "object") {
+        if (typeof window.TMSConfig['tmsConfig_tmsList'] === "object" && Object.keys(window.TMSConfig['tmsConfig_tmsList']).length > 0) {
+            if (document.querySelectorAll('script').length > 0) {
+                var scriptsOnPage = document.querySelectorAll('script');
+                var TMSCount = Object.keys(window.TMSConfig['tmsConfig_tmsList']).length;
+                var TMSFound = 0;
+          
+                window.TMSHelper.console("[TMSConfig.identifyTMS] -> info: identifying TMS...");
+          
+                loopScripts: for (var i = 0; i < scriptsOnPage.length; i++) {
+                    // window.TMSHelper.console("[TMSConfig.identifyTMS] -> i = " + i);
+                                 
+                    var src = scriptsOnPage[i].src;
+                    // window.TMSHelper.console("[TMSConfig.identifyTMS] -> script source = " + src);
+          
+                    loopTMS: for (var j = 0; j < TMSCount; j++) {
+                        // window.TMSHelper.console("[TMSConfig.identifyTMS] -> j = " + j);
+                                     
+                        var key = Object.keys(window.TMSConfig['tmsConfig_tmsList'])[j];
+                        // window.TMSHelper.console("[TMSConfig.identifyTMS] -> key = " + key);
+                                     
+                        if (typeof window.TMSConfig['tmsConfig_tool_' + key + '_flag'] === "undefined" || window.TMSConfig['tmsConfig_tool_' + key + '_flag'] === false) {
+                            // only continue if TMS wasnt already identified earlier
+          
+                            var regex = new RegExp(window.TMSConfig['tmsConfig_tmsList'][key], "g");
+                            // window.TMSHelper.console("[TMSConfig.identifyTMS] -> regex = " + regex);
+                                         
+                            if (regex.test(src)) {
+                                window.TMSHelper.console("[TMSConfig.identifyTMS] -> info: found TMS: " + key);
+                                              
+                                // Set flag for found script
+                                // This was already checked earlier => redundant to verify existence again
+                                window.TMSConfig['tmsConfig_tool_' + key + '_flag'] = true;
+         
+                                // Set source URL for found script
+                                if (typeof window.TMSConfig['tmsConfig_tool_' + key + '_src_url'] === "undefined" || window.TMSConfig['tmsConfig_tool_' + key + '_src_url'] === "") {
+                                    window.TMSConfig['tmsConfig_tool_' + key + '_src_url'] = src;
+                                } else {
+                                    window.TMSHelper.console("[TMSConfig.identifyTMS] -> warning: TMSConfig[tmsConfig_tool_" + key + "_src_url] already defined");
+                                }
+          
+                                // Identify environment
+                                if (typeof window.TMSConfig['tmsConfig_tool_' + key + '_src_environment'] === "undefined" || window.TMSConfig['tmsConfig_tool_' + key + '_src_environment'] === "") {
+                                    if (key === "TiQ") {
+                                        // Check if Tealium ut.env is set (can be manipulated to be different from source code during debugging) and use value
+                                        // (usually not available at this point in time but checked to ensure that script is not interfering with product core),
+                                        // Otherwise use value found in configuration path of source code
+                                        if (typeof utag.data['ut.env'] !== "undefined") {
+                                            window.TMSConfig['tmsConfig_tool_' + key + '_src_environment'] = utag.data['ut.env'];
+                                        } else if (typeof src === "string" && src !== "") {
+                                            window.TMSConfig['tmsConfig_tool_' + key + '_src_environment'] = src.split('/')[6];
+                                        } else {
+                                            window.TMSConfig['tmsConfig_tool_' + key + '_src_environment'] = "prod"
+                                        }
+                                    } else if (key === "GTM" && document.querySelectorAll('iframe').length > 0) {
+                                        // Is GTMs preview mode active and can its iframe be detected?
+                                        // Note: GTMs integrated variable "Debug Mode" cant be used here since it is not accessible from JS, only within GTM
+                                        var iframesOnPage = document.querySelectorAll('iframe');
+                                        loopIframes: for (var k = 0; k < iframesOnPage.length; k++) {
+                                            if (typeof iframesOnPage[k].contentDocument !== "undefined" && iframesOnPage[k].contentDocument !== null) {
+                                                if (typeof iframesOnPage[k].contentDocument.documentElement !== "undefined" && iframesOnPage[k].contentDocument.documentElement !== null) {
+                                                    if (typeof iframesOnPage[k].contentDocument.documentElement.querySelector('gtm-component') !== "undefined" && iframesOnPage[k].contentDocument.documentElement.querySelector('gtm-component') !== null) {
+                                                        window.TMSConfig['tmsConfig_tool_' + key + '_src_environment'] = "dev";
+                                                        break loopIframes;
+                                                    } else {
+                                                        window.TMSConfig['tmsConfig_tool_' + key + '_src_environment'] = "prod";
+                                                        continue loopIframes;
+                                                    }
+                                                } else {
+                                                    window.TMSConfig['tmsConfig_tool_' + key + '_src_environment'] = "prod";
+                                                    continue loopIframes;
+                                                }
+                                            } else {
+                                                window.TMSConfig['tmsConfig_tool_' + key + '_src_environment'] = "prod";
+                                                continue loopIframes;
+                                            }
+                                        }
+                                    } else {
+                                        window.TMSConfig['tmsConfig_tool_' + key + '_src_environment'] = "prod"
+                                    }
+                                } else {
+                                    window.TMSHelper.console("[TMSConfig.identifyTMS] -> warning: TMSConfig[tmsConfig_tool_" + key + "_src_environment] already defined");
+                                }
+          
+                                // Check where/if loop should continue
+                                TMSFound++;
+                                if (TMSFound < TMSCount) {
+                                    // window.TMSHelper.console("[TMSConfig.identifyTMS] -> info: break (inner) loopTMS");
+                                    break loopTMS;
+                                } else {
+                                    // window.TMSHelper.console("[TMSConfig.identifyTMS] -> info: break (outer) loopScripts");
+                                    break loopScripts;
+                                }
+                            } else {
+                                window.TMSConfig['tmsConfig_tool_' + key + '_flag'] = false;
+                                window.TMSConfig['tmsConfig_tool_' + key + '_src_environment'] = "";
+                            }
+                        } else {
+                            // window.TMSHelper.console("[TMSConfig.identifyTMS] -> info: " + key + " was already identified earlier");
+                            continue loopTMS;
+                        }
+                    }
+                }
+          
+                window.TMSHelper.console("[TMSConfig.identifyTMS] -> info: identified " + TMSFound + " TMS");
+            } else {
+                window.TMSHelper.console("[TMSConfig.identifyTMS] -> warning: no scripts found on page");
+            }
+        } else {
+            window.TMSHelper.console("[TMSConfig.identifyTMS] -> warning: TMSConfig[tmsConfig_tmsList] not defined");
+        }
+    } else {
+        window.TMSHelper.console("[TMSConfig.identifyTMS] -> warning: TMSConfig is not defined");
+    }
+    window.TMSHelper.console("[TMSConfig.identifyTMS] complete");
+} catch (err) {
+    window.TMSHelper.console("[TMSConfig.identifyTMS] error:");
+    window.TMSHelper.errorHandler(err);
+};
+
+// +++++++++++++++++++++++++++++++++++++++++++++++++++++++
+// 1043 TMSConfig.tmsConfig_processing_processingObjectName
+// Issued by: Agnosticalyze
+// version: 1.1, 2022-06-25
+// +++++++++++++++++++++++++++++++++++++++++++++++++++++++
+   
+// Function determines the name of the (vendor specific) processing object
+try {
+    window.TMSHelper.console("[TMSConfig.tmsConfig_processing_processingObjectName] start");
+    if (typeof window.TMSConfig === "object") {
+        if (window.TMSConfig['tmsConfig_tool_TiQ_flag']) {
+            window.TMSConfig['tmsConfig_processing_processingObjectName'] = "b";
+        } else {
+            window.TMSConfig['tmsConfig_processing_processingObjectName'] = "TMSEvent";
+        }
+    } else {
+        window.TMSHelper.console("[TMSConfig.tmsConfig_processing_processingObjectName] -> warning: TMSConfig is not defined");
+    }
+    window.TMSHelper.console("[TMSConfig.tmsConfig_processing_processingObjectName] complete");
+} catch (err) {
+    window.TMSHelper.console("[TMSConfig.tmsConfig_processing_processingObjectName] error:");
+    window.TMSHelper.errorHandler(err);
+};
+
+// +++++++++++++++++++++++++++++++++++++++++++++++++++++++
+// 1051 TMSConfig.tmsConfig_event_collectContentHierarchy
+// Issued by: Agnosticalyze
+// version: 1.2, 2022-02-25
+// +++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+// Define variables of which the value should be persisted in TMSCache on events/VPVs
+try {
+    if (typeof window.TMSConfig === "object") {
+        if (typeof window.TMSConfig['tmsConfig_event_collectContentHierarchy'] === "undefined") {
+            window.TMSConfig['tmsConfig_event_collectContentHierarchy'] = true;
+        } else {
+            window.TMSHelper.console("[TMSConfig.tmsConfig_event_collectContentHierarchy] -> warning: Did not overwrite pre-existing TMSConfig[tmsConfig_event_collectContentHierarchy]");
+        }
+    }
+} catch (err) {
+    window.TMSHelper.console("[TMSConfig.tmsConfig_event_collectContentHierarchy] error:");
+    window.TMSHelper.errorHandler(err);
+};
+
+// +++++++++++++++++++++++++++++++++++++++++++++++++++++++
+// 1061 TMSConfig.tmsConfig_cookieDomain
+// Issued by: Agnosticalyze
+// version: 1.1, 2021-02-15
+// +++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ 
+// Define cookie domain to be used
+try {
+    if (typeof window.TMSConfig === "object") {
+        if (typeof window.TMSConfig['tmsConfig_cookieDomain'] === "undefined") {
+            window.TMSConfig['tmsConfig_cookieDomain'] = window.location.hostname;
+        } else {
+            window.TMSHelper.console("[TMSConfig.tmsConfig_cookieDomain] -> warning: Did not overwrite pre-existing TMSConfig[tmsConfig_tmsList]");
+        }
+    }
+} catch (err) {
+    window.TMSHelper.console("[TMSConfig.tmsConfig_cookieDomain] error:");
+    window.TMSHelper.errorHandler(err);
+};
+
+// +++++++++++++++++++++++++++++++++++++++++++++++++++++++
+// 1071 TMSConfig.tmsConfig_prodDomains
+// Issued by: Agnosticalyze
+// version: 1.1, 2021-02-15
+// +++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ 
+// List all possible PROD hosts
+try {
+    // window.TMSHelper.console("[TMSConfig.tmsConfig_prodDomains] start");
+ 
+     if (typeof window.TMSConfig === "object") {
+        if (typeof window.TMSConfig['tmsConfig_prodDomains'] !== "object" || Object.keys(window.TMSConfig['tmsConfig_prodDomains']).length === 0) {
+            window.TMSConfig['tmsConfig_prodDomains'] = ["kompass.projuventute.ch", "elternbriefe.projuventute.ch", "www.chesaspuondas.ch", "www.projuventute.ch", "www.147.ch"];
+            // window.TMSHelper.console("[TMSConfig.tmsConfig_prodDomains] -> info: TMSConfig[tmsConfig_prodDomains] defined");
+        } else {
+            window.TMSHelper.console("[TMSConfig.tmsConfig_prodDomains] -> warning: Did not overwrite pre-existing TMSConfig[tmsConfig_prodDomains]");
+        }
+     } else {
+        window.TMSHelper.console("[TMSConfig.tmsConfig_prodDomains] -> warning: TMSConfig is not defined");
+     }
+ 
+     // window.TMSHelper.console("[TMSConfig.tmsConfig_prodDomains] complete");
+} catch (err) {
+    window.TMSHelper.console("[TMSConfig.tmsConfig_prodDomains] error:");
+    window.TMSHelper.errorHandler(err);
+};
+
+// +++++++++++++++++++++++++++++++++++++++++++++++++++++++
+// 1081 TMSConfig.tmsConfig_event_track...
+// Issued by: Agnosticalyze
+// version: 1.1, 2022-01-28
+// +++++++++++++++++++++++++++++++++++++++++++++++++++++++
+  
+// Define default for event tracking flags
+try {
+    window.TMSHelper.console("[TMSConfig.tmsConfig_event_track...] start");
+    if (typeof window.TMSConfig === "object") {
+        // this function solves the issue where the intended value for the variable would be false
+        var value_or_default = function value_or_default(val, default_val) {
+          if (val === null || val === undefined || val === "") return default_val;
+          return val;
+        }
+        window.TMSConfig['tmsConfig_event_trackDefault'] = value_or_default(window.TMSConfig['tmsConfig_event_trackDefault'], false);
+        window.TMSConfig['tmsConfig_event_trackLinkOffsite'] = value_or_default(window.TMSConfig['tmsConfig_event_trackLinkOffsite'], true);
+        window.TMSConfig['tmsConfig_event_trackLinkOnsite'] = value_or_default(window.TMSConfig['tmsConfig_event_trackLinkOnsite'], false);
+        window.TMSConfig['tmsConfig_event_trackLinkDownload'] = value_or_default(window.TMSConfig['tmsConfig_event_trackLinkDownload'], true);
+        window.TMSConfig['tmsConfig_event_trackLinkMailto'] = value_or_default(window.TMSConfig['tmsConfig_event_trackLinkMailto'], true);
+        window.TMSConfig['tmsConfig_event_trackLinkPhone'] = value_or_default(window.TMSConfig['tmsConfig_event_trackLinkPhone'], true);
+    } else {
+        window.TMSHelper.console("[TMSConfig.tmsConfig_event_track...] -> warning: TMSConfig is not defined");
+    }
+    window.TMSHelper.console("[TMSConfig.tmsConfig_event_track...] complete");
+} catch (err) {
+    window.TMSHelper.console("[TMSConfig.tmsConfig_event_track...] error:");
+    window.TMSHelper.errorHandler(err);
+};
+
+// +++++++++++++++++++++++++++++++++++++++++++++++++++++++
+// 1082 TMSConfig.TMSConfig.tmsConfig_embed_...
+// Issued by: Agnosticalyze
+// version: 1.1, 2022-06-10
+// +++++++++++++++++++++++++++++++++++++++++++++++++++++++
+  
+try {
+    // window.TMSHelper.console("[TMSConfig.TMSConfig.tmsConfig_embed_...] start");
+  
+    if (typeof window.TMSConfig === "object") {
+        var value_or_default = function value_or_default(val, default_val) {
+          if (val === null || val === undefined || val === "") return default_val;
+          return val;
+        }
+        window.TMSConfig['tmsConfig_embed_sendToParentWindow']      = value_or_default(window.TMSConfig['tmsConfig_embed_sendToParentWindow'], false);
+        window.TMSConfig['tmsConfig_embed_receiveFromChildWindow']  = value_or_default(window.TMSConfig['tmsConfig_embed_receiveFromChildWindow'], false);
+        window.TMSConfig['tmsConfig_embed_trackIfChildWindow']      = value_or_default(window.TMSConfig['tmsConfig_embed_trackIfChildWindow'], false);
+    } else {
+        window.TMSHelper.console("[TMSConfig.tmsConfig_embed_...] -> warning: TMSConfig is not defined");
+    }
+  
+     // window.TMSHelper.console("[TMSConfig.TMSConfig.tmsConfig_embed_...] complete");
+} catch (err) {
+    window.TMSHelper.console("[TMSConfig.TMSConfig.tmsConfig_embed_...] error:");
+    window.TMSHelper.errorHandler(err);
+}; 
+
+// +++++++++++++++++++++++++++++++++++++++++++++++++++++++
+// 1091 TMSConfig.tmsConfig_processing_obfuscate_varsToScan
+// Issued by: Agnosticalyze
+// version: 1.2, 2022-06-03
+// +++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+// Set list of tmsConfig_processing_obfuscate_varsToScan variables
+try {
+	// window.TMSHelper.console("[TMSConfig.tmsConfig_processing_obfuscate_varsToScan] start");
+  
+	if (typeof window.TMSConfig === "object") {
+		if (typeof window.TMSConfig['tmsConfig_processing_obfuscate_varsToScan'] === "undefined" || window.TMSConfig['tmsConfig_processing_obfuscate_varsToScan'] === null) {
+			window.TMSConfig['tmsConfig_processing_obfuscate_varsToScan'] = [
+					  'error_errorInfo_sourceURL'
+					, 'page_url_canonical_url'
+					, 'page_url_canonical_queryString'
+					, 'page_url_window_url'
+					, 'page_url_window_fragmentIdentifier'
+					, 'page_url_window_queryString'
+					, 'page_url_input_url'
+			];
+		} else {
+			// Already found a list => warning
+			window.TMSHelper.console("[TMSConfig.tmsConfig_processing_obfuscate_varsToScan] -> warning: List of variables potentially containing email addresses already identified - value not overwritten");
+		}
+	}
+  
+	// window.TMSHelper.console("[TMSConfig.tmsConfig_processing_obfuscate_varsToScan] complete");
+} catch (err) {
+	// error handler
+	window.TMSHelper.console("[TMSConfig.tmsConfig_processing_obfuscate_varsToScan] error:");
+	window.TMSHelper.errorHandler(err);
+};
+
+// +++++++++++++++++++++++++++++++++++++++++++++++++++++++
+// 1092 TMSConfig.tmsConfig_processing_obfuscate_parametersToPreserve 
+// Issued by: Agnosticalyze
+// version: 1.0, 2022-06-03
+// +++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+// Set list of tmsConfig_processing_obfuscate_varsToScan variables
+try {
+	// window.TMSHelper.console("[TMSConfig.tmsConfig_processing_obfuscate_parametersToPreserve] start");
+  
+	if (typeof window.TMSConfig === "object") {
+		if (typeof window.TMSConfig['tmsConfig_processing_obfuscate_parametersToPreserve'] === "undefined" || window.TMSConfig['tmsConfig_processing_obfuscate_parametersToPreserve'] === null) {
+			window.TMSConfig['tmsConfig_processing_obfuscate_parametersToPreserve'] = [
+                  "console"
+                , "sourceid"
+                , "WT.mc_id"
+                , "gclid"
+                , "utm_id"
+                , "utm_source"
+                , "utm_medium"
+                , "utm_campaign"
+                , "utm_term"
+                , "utm_content"
+			];
+		} else {
+			// Already found a list => warning
+			window.TMSHelper.console("[TMSConfig.tmsConfig_processing_obfuscate_parametersToPreserve] -> warning: List of variables for which information should be preserved already identified - value not overwritten");
+		}
+	}
+  
+	// window.TMSHelper.console("[TMSConfig.tmsConfig_processing_obfuscate_parametersToPreserve] complete");
+} catch (err) {
+	// error handler
+	window.TMSHelper.console("[TMSConfig.tmsConfig_processing_obfuscate_parametersToPreserve] error:");
+	window.TMSHelper.errorHandler(err);
+};
+
+// +++++++++++++++++++++++++++++++++++++++++++++++++++++++
+// 1093 TMSConfig.tmsConfig_processing_obfuscate_mask...
+// Issued by: Agnosticalyze
+// version: 1.0, 2022-06-08
+// +++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+// Set flags of tmsConfig_processing_obfuscate_mask... variables
+try {
+	// window.TMSHelper.console("[TMSConfig.tmsConfig_processing_obfuscate_mask...] start");
+  
+	if (typeof window.TMSConfig === "object") {
+		window.TMSConfig['tmsConfig_processing_obfuscate_maskEmail'] 				= window.TMSConfig['tmsConfig_processing_obfuscate_maskEmail'] 				|| true;
+		window.TMSConfig['tmsConfig_processing_obfuscate_maskUnknownParameters'] 	= window.TMSConfig['tmsConfig_processing_obfuscate_maskUnknownParameters'] 	|| false;
+	}
+  
+	// window.TMSHelper.console("[TMSConfig.tmsConfig_processing_obfuscate_mask...] complete");
+} catch (err) {
+	// error handler
+	window.TMSHelper.console("[TMSConfig.tmsConfig_processing_obfuscate_mask...] error:");
+	window.TMSHelper.errorHandler(err);
+};
+
+// +++++++++++++++++++++++++++++++++++++++++++++++++++++++
+// 1100 TMSProcessing Create
+// Issued by: Agnosticalyze
+// version: 1.0, 2022-06-14
+// +++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+// Creates TMSConfig object if not yet available
+window.TMSProcessing = window.TMSProcessing || [];
+
+// +++++++++++++++++++++++++++++++++++++++++++++++++++++++
+// 1101 TMSProcessing.getPageURLWindow
+// Issued by: Agnosticalyze
+// version: 2.3, 2021-05-15
+// +++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    
+// Get window URL
+window.TMSProcessing = window.TMSProcessing || {}; // remove this line if function is included inside a collection wrapper
+window.TMSProcessing.getPageURLWindow = function () { // remove this line for including function inside a collection wrapper
+// function getPageURLWindow() {  // uncomment this line for including function inside a collection wrapper
+    try {
+        window.TMSHelper.console("[TMSProcessing.getPageURLWindow] start");
+          
+        // set processing flag
+        var processingFlag = false;
+              
+        if(typeof window.TMSEvent === "object") {
+            if (typeof window.TMSEvent['page_url_window_url'] === "string" && window.TMSEvent['page_url_window_url'] !== "") {
+                // 1 page URL is already defined in TMSEvent
+                window.TMSHelper.console("[TMSProcessing.getPageURLWindow] -> info: Page URL found in TMSEvent");
+              
+                // 1.1 check if URL is valid and complete
+                var startWithProtocol = new RegExp("^[a-zA-Z]*:");
+                if (startWithProtocol.test(window.TMSEvent['page_url_window_url'])) {
+                    // 1.1.1 slash TMSEvent Full Page URL into temporary Page URL variables for further processing
+                    var slashedUrl = window.TMSHelper.URLslasher(window.TMSEvent['page_url_window_url']);
+          
+                    // 1.1.2 copy to TMSEvent
+                    window.TMSEvent = window.TMSHelper.copyVarsFromObjectToObject({
+                              sourceObject: slashedUrl
+                            , mergeObject: window.TMSEvent
+                            , targetPrefix: "page_url_window_"
+                            , overwrite: true
+                            , harmonize: false
+                            , includeFromSource: {}
+                            , excludeFromSource: {}
+                            , includeFromMerge: {}
+                            , excludeFromMerge: {}
+                            , flatten: false
+                        });
+          
+                    // 1.1.3 set processing flag
+                    processingFlag = true;
+                } else {
+                    window.TMSHelper.console("[TMSProcessing.getPageURLWindow] -> warning: TMSEvent[page_url_window_url] does not seem to be a valid absolute URL, checking for URL parts in TMSEvent next");
+                          
+                    // do not set processing flag
+                    processingFlag = false;
+                }
+            } else {
+                window.TMSHelper.console("[TMSProcessing.getPageURLWindow] -> info: TMSEvent[page_url_window_url] not found, checking for URL parts in TMSEvent next");
+                      
+                // do not set processing flag
+                processingFlag = false;
+            }
+          
+            if (!processingFlag) {
+                if ( 
+                           (typeof window.TMSEvent['page_url_window_protocol'] === "string"             && window.TMSEvent['page_url_window_protocol'] !== "")
+                        || (typeof window.TMSEvent['page_url_window_hostname'] === "string"             && window.TMSEvent['page_url_window_hostname'] != "")
+                        || (typeof window.TMSEvent['page_url_window_path'] === "string"                 && window.TMSEvent['page_url_window_path'] !== "")
+                        || (typeof window.TMSEvent['page_url_window_queryString'] === "string"          && window.TMSEvent['page_url_window_queryString'] !== "")
+                        || (typeof window.TMSEvent['page_url_window_fragmentIdentifier'] === "string"   && window.TMSEvent['page_url_window_fragmentIdentifier'] !== "")
+                        ) {
+                    // 2 page URL parts are already defined in TMSEvent
+                    window.TMSHelper.console("[TMSProcessing.getPageURLWindow] -> info: (at least one) Page URL Part found in TMSEvent");
+                    var reverseOrderedAttributes = ["fragmentIdentifier", "queryString", "path", "hostname", "protocol"];
+          
+                    // 2.1 get URL to merge with, either from TMSCache or window.location
+                    if (
+                           (typeof window.TMSCache['page_url_window_protocol'] === "string"             && window.TMSCache['page_url_window_protocol'] !== "")
+                        || (typeof window.TMSCache['page_url_window_hostname'] === "string"             && window.TMSCache['page_url_window_hostname'] != "")
+                        || (typeof window.TMSCache['page_url_window_path'] === "string"                 && window.TMSCache['page_url_window_path'] !== "")
+                        || (typeof window.TMSCache['page_url_window_queryString'] === "string"          && window.TMSCache['page_url_window_queryString'] !== "")
+                        || (typeof window.TMSCache['page_url_window_fragmentIdentifier'] === "string"   && window.TMSCache['page_url_window_fragmentIdentifier'] !== "")
+                        ) {
+                        // 2.1.1 use vars from TMSCache as reference
+                        var mergeObject = [];
+                        mergeObject['protocol'] = window.TMSCache['page_url_window_protocol'] || "";
+                        mergeObject['hostname'] = window.TMSCache['page_url_window_hostname'] || "";
+                        mergeObject['path'] = window.TMSCache['page_url_window_path'] || "";
+                        mergeObject['queryString'] = window.TMSCache['page_url_window_queryString'] || "";
+                        mergeObject['fragmentIdentifier'] = window.TMSCache['page_url_window_fragmentIdentifier'] || "";
+          
+                        window.TMSHelper.console("[TMSProcessing.getPageURLWindow] -> info: TMSCache URL parts applied as reference");
+                    } else {
+                        // 2.1.2 use vars from window.location as reference
+                        var mergeObject = window.TMSHelper.URLslasher(window.location.href);
+          
+                        window.TMSHelper.console("[TMSProcessing.getPageURLWindow] -> info: window.location URL parts applied as reference");
+                    }
+          
+                    var pageUrlConstructed = "";
+          
+                    // 2.2 loop through url parts
+                    for (i = 0; i < reverseOrderedAttributes.length; i++) {
+                        if (typeof window.TMSEvent['page_url_window_' + reverseOrderedAttributes[i]] === "string" && window.TMSEvent['page_url_window_' + reverseOrderedAttributes[i]] !== "") {
+                            if (reverseOrderedAttributes[i] === "protocol") {
+                                pageUrlConstructed = window.TMSEvent['page_url_window_' + reverseOrderedAttributes[i]] + "//" + pageUrlConstructed;
+                            } else if (reverseOrderedAttributes[i] === "queryString") {
+                                pageUrlConstructed = "?" + window.TMSEvent['page_url_window_' + reverseOrderedAttributes[i]] + pageUrlConstructed;
+                            } else if (reverseOrderedAttributes[i] === "fragmentIdentifier") {
+                                pageUrlConstructed = "#" + window.TMSEvent['page_url_window_' + reverseOrderedAttributes[i]] + pageUrlConstructed;
+                            } else {
+                                pageUrlConstructed = window.TMSEvent['page_url_window_' + reverseOrderedAttributes[i]] + pageUrlConstructed;
+                            }
+                        } else {
+                            if (typeof mergeObject[reverseOrderedAttributes[i]] === "string" && mergeObject[reverseOrderedAttributes[i]] !== "") {
+                                if (reverseOrderedAttributes[i] === "protocol") {
+                                    pageUrlConstructed = mergeObject[reverseOrderedAttributes[i]] + "//" + pageUrlConstructed;
+                                } else if (reverseOrderedAttributes[i] === "queryString") {
+                                    pageUrlConstructed = "?" + mergeObject[reverseOrderedAttributes[i]] + pageUrlConstructed;
+                                } else if (reverseOrderedAttributes[i] === "fragmentIdentifier") {
+                                    pageUrlConstructed = "#" + mergeObject[reverseOrderedAttributes[i]] + pageUrlConstructed;
+                                } else {
+                                    pageUrlConstructed = mergeObject[reverseOrderedAttributes[i]] + pageUrlConstructed;
+                                }
+                            }
+                        }
+                    }
+          
+                    // 2.3 slash consctructed page URL
+                    var pageUrlConstructedSlashed = window.TMSHelper.URLslasher(pageUrlConstructed);
+                  
+                    // 2.4 copy to TMSEvent
+                    window.TMSEvent = window.TMSHelper.copyVarsFromObjectToObject({
+                              sourceObject: pageUrlConstructedSlashed
+                            , mergeObject: window.TMSEvent
+                            , targetPrefix: "page_url_window_"
+                            , overwrite: true
+                            , harmonize: false
+                            , includeFromSource: {}
+                            , excludeFromSource: {}
+                            , includeFromMerge: {}
+                            , excludeFromMerge: {}
+                            , flatten: false
+                        });
+          
+                    // 2.5 set processing flag
+                    processingFlag = true;
+          
+                } else {
+                    window.TMSHelper.console("[TMSProcessing.getPageURLWindow] -> info: TMSEvent does not contain URL parts, checking for TMSCache next");
+                          
+                    // do not set processing flag
+                    processingFlag = false;
+                }
+            }
+     
+            if (!processingFlag) {
+                if (typeof window.TMSCache === "object") {
+                    // 3 nothing found in TMSEvent so far, check TMSCache
+                    if (
+                           (typeof window.TMSCache['page_url_window_url'] === "string"                  && window.TMSCache['page_url_window_url'] !== "")
+                        || (typeof window.TMSCache['page_url_window_protocol'] === "string"             && window.TMSCache['page_url_window_protocol'] !== "")
+                        || (typeof window.TMSCache['page_url_window_hostname'] === "string"             && window.TMSCache['page_url_window_hostname'] != "")
+                        || (typeof window.TMSCache['page_url_window_path'] === "string"                 && window.TMSCache['page_url_window_path'] !== "")
+                        || (typeof window.TMSCache['page_url_window_queryString'] === "string"          && window.TMSCache['page_url_window_queryString'] !== "")
+                        || (typeof window.TMSCache['page_url_window_fragmentIdentifier'] === "string"   && window.TMSCache['page_url_window_fragmentIdentifier'] !== "")
+                        ) {
+                        // 3.1 URL found in TMSCache
+                        window.TMSEvent['page_url_window_url']                = window.TMSCache['page_url_window_url'] || "";
+                        window.TMSEvent['page_url_window_protocol']           = window.TMSCache['page_url_window_protocol'] || "";
+                        window.TMSEvent['page_url_window_hostname']           = window.TMSCache['page_url_window_hostname'] || "";
+                        window.TMSEvent['page_url_window_path']               = window.TMSCache['page_url_window_path'] || "";
+                        window.TMSEvent['page_url_window_queryString']        = window.TMSCache['page_url_window_queryString'] || "";
+                        window.TMSEvent['page_url_window_fragmentIdentifier'] = window.TMSCache['page_url_window_fragmentIdentifier'] || "";
+                  
+                        window.TMSHelper.console("[TMSProcessing.getPageURLWindow] -> info: TMSCache contains URL parts, copied to TMSEvent");
+                    } else {
+                            window.TMSHelper.console("[TMSProcessing.getPageURLWindow] -> info: TMSCache does not contain URL parts, fallback on window.location next");
+                                  
+                            // do not set processing flag
+                            processingFlag = false;
+                    }
+                } else {
+                    window.TMSHelper.console("[TMSProcessing.getPageURLWindow] -> warning: TMSCache is not defined");
+                } // end if TMSCache
+            } // end if processingFlag
+     
+            if (!processingFlag) {
+                // 4 Nothing found anywhere, use window.location as fallback
+                window.TMSHelper.console("[TMSProcessing.getPageURLWindow] -> info: window.location used as fallback");
+ 
+                // 4.1 retrieve and slash window.location into temporary variables for further processing
+                var windowLocationSlashed = window.TMSHelper.URLslasher(window.location.href);
+                      
+                // 4.2 copy to TMSEvent
+                window.TMSEvent = window.TMSHelper.copyVarsFromObjectToObject({
+                              sourceObject: windowLocationSlashed
+                            , mergeObject: window.TMSEvent
+                            , targetPrefix: "page_url_window_"
+                            , overwrite: true
+                            , harmonize: false
+                            , includeFromSource: {}
+                            , excludeFromSource: {}
+                            , includeFromMerge: {}
+                            , excludeFromMerge: {}
+                            , flatten: false
+                        });
+              
+                window.TMSHelper.console("[TMSProcessing.getPageURLWindow] -> info: window.location slashed and copied to TMSEvent");
+            } // end if
+ 
+            // concat hostname and path
+            if (typeof window.TMSEvent['page_url_window_hostname'] === "string" && typeof window.TMSEvent['page_url_window_path'] === "string") {
+                if (window.TMSEvent['page_url_window_path'].startsWith("/")) {
+                    window.TMSEvent['page_url_window_hostnameAndPath'] = window.TMSEvent['page_url_window_hostname'].concat(window.TMSEvent['page_url_window_path']);
+                } else {
+                    window.TMSEvent['page_url_window_hostnameAndPath'] = window.TMSEvent['page_url_window_hostname'].concat("/");
+                    window.TMSEvent['page_url_window_hostnameAndPath'] = window.TMSEvent['page_url_window_hostnameAndPath'].concat(window.TMSEvent['page_url_window_path']);
+                }
+            }
+          
+        } else {
+            window.TMSHelper.console("[TMSProcessing.getPageURLWindow] warning -> TMSEvent is not defined");
+        } // end if TMSEvent
+     
+        window.TMSHelper.console("[TMSProcessing.getPageURLWindow] complete");
+    } catch (err) {
+        window.TMSHelper.console("[TMSProcessing.getPageURLWindow] error:");
+        window.TMSHelper.errorHandler(err);
+    };
+};
+
