@@ -26,7 +26,7 @@
 	, isOnsiteLink: 						isOnsiteLink // isOnsiteLink(url)
 	, isPhoneLink: 							isPhoneLink // isPhoneLink(url)
 	, identifySocialProvider: 				identifySocialProvider // identifySocialProvider(url)
-//  , copyVarsFromObjectToObject: 			copyVarsFromObjectToObject // copyVarsFromObjectToObject(sourceObject, mergeObject, targetPrefix, overwrite, harmonize, includeFromSource, excludeFromSource, includeFromMerge, excludeFromMerge, sourcePrefix, flatten)
+    , copyVarsFromObjectToObject: 			copyVarsFromObjectToObject // copyVarsFromObjectToObject(sourceObject, mergeObject, targetPrefix, overwrite, harmonize, includeFromSource, excludeFromSource, includeFromMerge, excludeFromMerge, sourcePrefix, flatten)
     , flattenObject:                        flattenObject // flattenObject(input)
     , harmonize: 							harmonize // harmonize(config, obj)
     , lowercaseValues: 						lowercaseValues // lowercaseValues(obj, skip_keys)
