@@ -1,4 +1,3 @@
-// Extension (wrapper function to not leak variables)
 (function () {
 	
 	window.TMSHelper = {
@@ -2504,7 +2503,7 @@ function calculateProgress(currentPosition, totalDuration) {
     }
 }
 	
-})()
+})();
 
 // +++++++++++++++++++++++++++++++++++++++++++++++++++++++
 // 0201 TMSConfig Create
