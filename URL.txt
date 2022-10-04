@@ -1,8 +1,8 @@
 # with pseudo-consent-agree:
-https://cdn.jsdelivr.net/combine/gh/projuventute/agnosticalyze@VERSION/extensions.min.js,gh/projuventute/agnosticalyze@VERSION/config.min.js,gh/projuventute/agnosticalyze@VERSION/listener.min.js,gh/projuventute/agnosticalyze@VERSION/consent/pseudoConsentAgree.min.js
+https://cdn.jsdelivr.net/combine/gh/projuventute/agnosticalyze@VERSION/extensions.min.js,gh/projuventute/agnosticalyze@VERSION/config.min.js,gh/projuventute/agnosticalyze@VERSION/listener.min.js,gh/projuventute/agnosticalyze@VERSION/ipFilter/getCurrentIp.min.js,gh/projuventute/agnosticalyze@VERSION/consent/pseudoConsentAgree.min.js
 
 # without pseudo-consent-agree:
-https://cdn.jsdelivr.net/combine/gh/projuventute/agnosticalyze@VERSION/extensions.min.js,gh/projuventute/agnosticalyze@VERSION/config.min.js,gh/projuventute/agnosticalyze@VERSION/listener.min.js
+https://cdn.jsdelivr.net/combine/gh/projuventute/agnosticalyze@VERSION/extensions.min.js,gh/projuventute/agnosticalyze@VERSION/config.min.js,gh/projuventute/agnosticalyze@VERSION/listener.min.js,gh/projuventute/agnosticalyze@VERSION/ipFilter/getCurrentIp.min.js
 
 # each
 https://cdn.jsdelivr.net/gh/projuventute/agnosticalyze@VERSION/config.min.js
