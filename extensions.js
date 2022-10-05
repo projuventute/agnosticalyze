@@ -6371,10 +6371,7 @@ window.TMSProcessing.runOrchestrator = function () {
             
         if (typeof window.TMSProcessing === "object") {
             if (typeof window.TMSProcessing.TMSEventOrchestrator === "function") {
-                // wait 0.5 seconds for ipify.org to return an IP (on first PV-P)
-                setTimeout(function() {
-                    window.TMSProcessing.TMSEventOrchestrator();
-                }, 500);
+                window.TMSProcessing.TMSEventOrchestrator();
             } else {
                 window.TMSHelper.console("[Run TMSProcessing.TMSEventOrchestrator] -> warning: TMSProcessing.TMSEventOrchestrator not defined");
             }
