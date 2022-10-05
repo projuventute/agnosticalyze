@@ -6371,7 +6371,10 @@ window.TMSProcessing.runOrchestrator = function () {
             
         if (typeof window.TMSProcessing === "object") {
             if (typeof window.TMSProcessing.TMSEventOrchestrator === "function") {
-                window.TMSProcessing.TMSEventOrchestrator();
+                // wait 0.5 seconds for ipify.org to return an IP (on first PV-P)
+                setTimeout(function() {
+                    window.TMSProcessing.TMSEventOrchestrator();
+                }, 500);
             } else {
                 window.TMSHelper.console("[Run TMSProcessing.TMSEventOrchestrator] -> warning: TMSProcessing.TMSEventOrchestrator not defined");
             }
@@ -6408,15 +6411,12 @@ window.TMSProcessing.gtmTriggerAfterProcessing = function () {
                         window.TMSHelper.console("[GTM trigger after processing] -> info: sending request to GTM");
                 
                         try {
-                            // wait 0.5 seconds for ipify.org to return an IP (on first PV-P)
-                            setTimeout(function() {
-                                // push event to GTM
-                                pushFunction({'event': window.TMSEvent['event_eventInfo_type']});
+                            // push event to GTM
+                            pushFunction({'event': window.TMSEvent['event_eventInfo_type']});
         
-                                // flush GTM data layer to avoid persistence
-                                // note: the function "reset" is always defined in the object "dataLayer" within the object "google_tag_manager[...]", regardless of the data layer name
-                                // window.google_tag_manager[window.TMSHelper.getVarFromString(window.TMSConfig['tmsConfig_tool_GTM_src'], "id")].dataLayer.reset();
-                            }, 500);
+                            // flush GTM data layer to avoid persistence
+                            // note: the function "reset" is always defined in the object "dataLayer" within the object "google_tag_manager[...]", regardless of the data layer name
+                            // window.google_tag_manager[window.TMSHelper.getVarFromString(window.TMSConfig['tmsConfig_tool_GTM_src'], "id")].dataLayer.reset();
                         } catch (e) {
                             window.TMSHelper.console("[GTM trigger after processing] error:");
                             window.TMSHelper.errorHandler(e);
@@ -6449,10 +6449,7 @@ window.TMSProcessing.runSendToParentWindow = function () {
             
         if (typeof window.TMSProcessing === "object") {
             if (typeof window.TMSProcessing.sendToParentWindow=== "function") {
-                // wait 0.5 seconds for ipify.org to return an IP (on first PV-P)
-                setTimeout(function() {
-                    window.TMSProcessing.sendToParentWindow(window.TMSEvent);
-                }, 500);
+                window.TMSProcessing.sendToParentWindow(window.TMSEvent);
             } else {
                 window.TMSHelper.console("[Run TMSProcessing.sendToParentWindow] -> warning: TMSProcessing.sendToParentWindow not defined");
             }
