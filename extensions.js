@@ -6358,3 +6358,138 @@ window.TMSProcessing.obfuscateParameters = function (inputObject) {
         TMSHelper.errorHandler(error);
     }
 };
+
+// +++++++++++++++++++++++++++++++++++++++++++++++++++++++
+// 1201 Run TMSProcessing.TMSEventOrchestrator
+// Issued by: Agnosticalyze
+// version: 1.0, 2022-04-01
+// +++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+window.TMSProcessing.runOrchestrator = function () {
+    try {
+        window.TMSHelper.console("[Run TMSProcessing.TMSEventOrchestrator] start");
+            
+        if (typeof window.TMSProcessing === "object") {
+            if (typeof window.TMSProcessing.TMSEventOrchestrator === "function") {
+                window.TMSProcessing.TMSEventOrchestrator();
+            } else {
+                window.TMSHelper.console("[Run TMSProcessing.TMSEventOrchestrator] -> warning: TMSProcessing.TMSEventOrchestrator not defined");
+            }
+        } else {
+            window.TMSHelper.console("[Run TMSProcessing.TMSEventOrchestrator] -> warning: TMSProcessing not defined");
+        }
+            
+        window.TMSHelper.console("[Run TMSProcessing.TMSEventOrchestrator] complete");
+    } catch (err) {
+        window.TMSHelper.console("[Run TMSProcessing.TMSEventOrchestrator] error:");
+        window.TMSHelper.errorHandler(err);
+    }
+};
+
+// +++++++++++++++++++++++++++++++++++++++++++++++++++++++
+// 4993 GTM trigger after processing
+// Issued by: Agnosticalyze
+// version: 1.0, 2021-03-13
+// +++++++++++++++++++++++++++++++++++++++++++++++++++++++
+   
+window.TMSProcessing.gtmTriggerAfterProcessing = function () {
+    try {
+        window.TMSHelper.console("[GTM trigger after processing] start"); 
+    
+        if (typeof window.TMSEvent === "object" && typeof window.TMSEvent['event_eventInfo_type'] === "string" && window.TMSEvent['event_eventInfo_type'] !== "") {
+     
+                // GTM specific request
+                if (window.TMSConfig['tmsConfig_tool_GTM_flag']) {
+                 
+                    // define pushFunction based on GTMs data layer name
+                    var pushFunction = window.TMSHelper.getVarFromWindowScopedObject(window.TMSConfig['tmsConfig_udoName'], "push")
+                     
+                    if (typeof pushFunction === "function" && typeof window.google_tag_manager === "object") {
+                        window.TMSHelper.console("[GTM trigger after processing] -> info: sending request to GTM");
+                
+                        try {
+                            // wait 0.5 seconds for ipify.org to return an IP (on first PV-P)
+                            setTimeout(function() {
+                                // push event to GTM
+                                pushFunction({'event': window.TMSEvent['event_eventInfo_type']});
+        
+                                // flush GTM data layer to avoid persistence
+                                // note: the function "reset" is always defined in the object "dataLayer" within the object "google_tag_manager[...]", regardless of the data layer name
+                                // window.google_tag_manager[window.TMSHelper.getVarFromString(window.TMSConfig['tmsConfig_tool_GTM_src'], "id")].dataLayer.reset();
+                            }, 500);
+                        } catch (e) {
+                            window.TMSHelper.console("[GTM trigger after processing] error:");
+                            window.TMSHelper.errorHandler(e);
+                        }
+                    } else {
+                        window.TMSHelper.console("[GTM trigger after processing] -> warning: invalid configuration of GTM");
+                    }
+                }
+     
+        } else {
+            window.TMSHelper.console("[GTM trigger after processing] -> warning: event_eventInfo_type not defined");
+        }
+     
+        window.TMSHelper.console("[GTM trigger after processing] complete");
+    } catch (err) {
+        window.TMSHelper.console("[GTM trigger after processing] error:");
+        window.TMSHelper.errorHandler(err);
+    }
+};
+
+// +++++++++++++++++++++++++++++++++++++++++++++++++++++++
+// 4994 Run TMSProcessing.sendToParentWindow
+// Issued by: Agnosticalyze
+// version: 1.0, 2022-04-22
+// +++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+window.TMSProcessing.runSendToParentWindow = function () {
+    try {
+        window.TMSHelper.console("[Run TMSProcessing.sendToParentWindow] start");
+            
+        if (typeof window.TMSProcessing === "object") {
+            if (typeof window.TMSProcessing.sendToParentWindow=== "function") {
+                // wait 0.5 seconds for ipify.org to return an IP (on first PV-P)
+                setTimeout(function() {
+                    window.TMSProcessing.sendToParentWindow(window.TMSEvent);
+                }, 500);
+            } else {
+                window.TMSHelper.console("[Run TMSProcessing.sendToParentWindow] -> warning: TMSProcessing.sendToParentWindow not defined");
+            }
+        } else {
+            window.TMSHelper.console("[Run TMSProcessing.sendToParentWindow] -> warning: TMSProcessing not defined");
+        }
+            
+        window.TMSHelper.console("[Run TMSProcessing.sendToParentWindow] complete");
+    } catch (err) {
+        window.TMSHelper.console("[Run TMSProcessing.sendToParentWindow] error:");
+        window.TMSHelper.errorHandler(err);
+    }
+};
+
+// +++++++++++++++++++++++++++++++++++++++++++++++++++++++
+// 4999 Run TMSProcessing.dataLayerSynchronizationOrchestrator
+// Issued by: Agnosticalyze
+// version: 1.0, 2022-04-01
+// +++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+window.TMSProcessing.runDataLayerSync = function () {
+    try {
+        window.TMSHelper.console("[Run TMSProcessing.dataLayerSynchronizationOrchestrator] start");
+            
+        if (typeof window.TMSProcessing === "object") {
+            if (typeof window.TMSProcessing.dataLayerSynchronizationOrchestrator === "function") {
+                window.TMSProcessing.dataLayerSynchronizationOrchestrator();
+            } else {
+                window.TMSHelper.console("[Run TMSProcessing.dataLayerSynchronizationOrchestrator] -> warning: TMSProcessing.dataLayerSynchronizationOrchestrator not defined");
+            }
+        } else {
+            window.TMSHelper.console("[Run TMSProcessing.dataLayerSynchronizationOrchestrator] -> warning: TMSProcessing not defined");
+        }
+            
+        window.TMSHelper.console("[Run TMSProcessing.dataLayerSynchronizationOrchestrator] complete");
+    } catch (err) {
+        window.TMSHelper.console("[Run TMSProcessing.dataLayerSynchronizationOrchestrator] error:");
+        window.TMSHelper.errorHandler(err);
+    }
+};
