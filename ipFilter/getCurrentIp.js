@@ -4,7 +4,7 @@ window.TMSHelper.getCurrentIp = function () {
         if (typeof userIpFromLocalStorage !== 'string' || userIpFromLocalStorage !== '') {
             var xmlHttp = new XMLHttpRequest();
             xmlHttp.onreadystatechange = function() { 
-                if (xmlHttp.readyState === 4 && xmlHttp.status === 200)
+                if (xmlHttp.readyState == 4 && xmlHttp.status == 200) {
                     var currentIp = JSON.parse(xmlHttp.responseText).ip;
                     // console.log("current IP: " + currentIp);
                     // window.userIp = currentIp;
@@ -25,6 +25,7 @@ window.TMSHelper.getCurrentIp = function () {
                     } catch (e) {
                         window.TMSHelper.errorHandler(e);
                     }
+                }
             }
             xmlHttp.open( "GET", "https://api.ipify.org?format=json", true ); // false for synchronous request
             xmlHttp.send();
