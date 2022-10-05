@@ -20,7 +20,7 @@ window.TMSHelper.getCurrentIp = function () {
                         );
                         // push event to GTM
                         pushFunction({
-                            event: "Run TMSProcessing.TMSEventOrchestrator",
+                            event: "TEST Run TMSProcessing.TMSEventOrchestrator",
                         });
                     } catch (e) {
                         window.TMSHelper.errorHandler(e);
