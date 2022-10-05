@@ -1,7 +1,23 @@
 window.TMSHelper.getCurrentIp = function () {
     try {
         var userIpFromLocalStorage = window.TMSHelper.readValue('userIp', false);
-        if (typeof userIpFromLocalStorage !== 'string' || userIpFromLocalStorage === '') {
+        if (typeof userIpFromLocalStorage === 'string' && userIpFromLocalStorage !== '') {
+            // run TMSProcessing.TMSEventOrchestrator after IP is stored
+            // trigger GTM Event
+            try {
+                // get push function (depending on udoNname)
+                var pushFunction = window.TMSHelper.getVarFromWindowScopedObject(
+                    window.TMSConfig["tmsConfig_udoName"],
+                    "push"
+                );
+                // push event to GTM
+                pushFunction({
+                    event: "Run TMSProcessing.TMSEventOrchestrator",
+                });
+            } catch (e) {
+                window.TMSHelper.errorHandler(e);
+            }
+        } else {
             var xmlHttp = new XMLHttpRequest();
             xmlHttp.onreadystatechange = function() { 
                 if (xmlHttp.readyState == 4 && xmlHttp.status == 200) {
@@ -29,22 +45,6 @@ window.TMSHelper.getCurrentIp = function () {
             }
             xmlHttp.open( "GET", "https://api.ipify.org?format=json", true ); // false for synchronous request
             xmlHttp.send();
-        } else {
-            // run TMSProcessing.TMSEventOrchestrator after IP is stored
-            // trigger GTM Event
-            try {
-                // get push function (depending on udoNname)
-                var pushFunction = window.TMSHelper.getVarFromWindowScopedObject(
-                    window.TMSConfig["tmsConfig_udoName"],
-                    "push"
-                );
-                // push event to GTM
-                pushFunction({
-                    event: "Run TMSProcessing.TMSEventOrchestrator",
-                });
-            } catch (e) {
-                window.TMSHelper.errorHandler(e);
-            }
         }
     } catch (err) {
         window.TMSHelper.console(err);
