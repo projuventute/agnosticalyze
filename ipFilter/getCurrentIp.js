@@ -9,6 +9,8 @@ window.TMSHelper.getCurrentIp = function () {
                     // console.log("current IP: " + currentIp);
                     // window.userIp = currentIp;
                     window.TMSHelper.storeValue('userIp', currentIp, 1);
+                    // run TMSProcessing.TMSEventOrchestrator after IP is stored
+                    window.TMSProcessing.runOrchestrator();
             }
             xmlHttp.open( "GET", "https://api.ipify.org?format=json", true ); // false for synchronous request
             xmlHttp.send( null );
