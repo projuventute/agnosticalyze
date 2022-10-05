@@ -29,6 +29,22 @@ window.TMSHelper.getCurrentIp = function () {
             }
             xmlHttp.open( "GET", "https://api.ipify.org?format=json", true ); // false for synchronous request
             xmlHttp.send();
+        } else {
+            // run TMSProcessing.TMSEventOrchestrator after IP is stored
+            // trigger GTM Event
+            try {
+                // get push function (depending on udoNname)
+                var pushFunction = window.TMSHelper.getVarFromWindowScopedObject(
+                    window.TMSConfig["tmsConfig_udoName"],
+                    "push"
+                );
+                // push event to GTM
+                pushFunction({
+                    event: "Run TMSProcessing.TMSEventOrchestrator",
+                });
+            } catch (e) {
+                window.TMSHelper.errorHandler(e);
+            }
         }
     } catch (err) {
         window.TMSHelper.console(err);
