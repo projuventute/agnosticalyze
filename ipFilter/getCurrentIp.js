@@ -10,7 +10,20 @@ window.TMSHelper.getCurrentIp = function () {
                     // window.userIp = currentIp;
                     window.TMSHelper.storeValue('userIp', currentIp, 1);
                     // run TMSProcessing.TMSEventOrchestrator after IP is stored
-                    window.TMSProcessing.runOrchestrator();
+                    // trigger GTM Event
+                    try {
+                        // get push function (depending on udoNname)
+                        var pushFunction = window.TMSHelper.getVarFromWindowScopedObject(
+                            window.TMSConfig["tmsConfig_udoName"],
+                            "push"
+                        );
+                        // push event to GTM
+                        pushFunction({
+                            event: "Run TMSProcessing.TMSEventOrchestrator",
+                        });
+                    } catch (e) {
+                        window.TMSHelper.errorHandler(e);
+                    }
             }
             xmlHttp.open( "GET", "https://api.ipify.org?format=json", true ); // false for synchronous request
             xmlHttp.send( null );
