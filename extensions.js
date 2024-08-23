@@ -6365,6 +6365,7 @@ window.TMSProcessing.obfuscateParameters = function (inputObject) {
 // version: 1.0, 2022-04-01
 // +++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
+/*
 window.TMSProcessing.runOrchestrator = function () {
     try {
         window.TMSHelper.console("[Run TMSProcessing.TMSEventOrchestrator] start");
@@ -6385,6 +6386,7 @@ window.TMSProcessing.runOrchestrator = function () {
         window.TMSHelper.errorHandler(err);
     }
 };
+*/
 
 // +++++++++++++++++++++++++++++++++++++++++++++++++++++++
 // 4993 GTM trigger after processing
