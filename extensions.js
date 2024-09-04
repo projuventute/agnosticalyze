@@ -6471,6 +6471,7 @@ window.TMSProcessing.runSendToParentWindow = function () {
 // version: 1.0, 2022-04-01
 // +++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
+/*
 window.TMSProcessing.runDataLayerSync = function () {
     try {
         window.TMSHelper.console("[Run TMSProcessing.dataLayerSynchronizationOrchestrator] start");
@@ -6491,3 +6492,4 @@ window.TMSProcessing.runDataLayerSync = function () {
         window.TMSHelper.errorHandler(err);
     }
 };
+*/
