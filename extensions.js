@@ -3183,6 +3183,7 @@ try {
 // version: 1.1, 2021-02-15
 // +++++++++++++++++++++++++++++++++++++++++++++++++++++++
  
+/*
 // List all possible PROD hosts
 try {
     // window.TMSHelper.console("[TMSConfig.tmsConfig_prodDomains] start");
@@ -3203,6 +3204,7 @@ try {
     window.TMSHelper.console("[TMSConfig.tmsConfig_prodDomains] error:");
     window.TMSHelper.errorHandler(err);
 };
+*/
 
 // +++++++++++++++++++++++++++++++++++++++++++++++++++++++
 // 1081 TMSConfig.tmsConfig_event_track...
@@ -6365,6 +6367,7 @@ window.TMSProcessing.obfuscateParameters = function (inputObject) {
 // version: 1.0, 2022-04-01
 // +++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
+/*
 window.TMSProcessing.runOrchestrator = function () {
     try {
         window.TMSHelper.console("[Run TMSProcessing.TMSEventOrchestrator] start");
@@ -6385,6 +6388,7 @@ window.TMSProcessing.runOrchestrator = function () {
         window.TMSHelper.errorHandler(err);
     }
 };
+*/
 
 // +++++++++++++++++++++++++++++++++++++++++++++++++++++++
 // 4993 GTM trigger after processing
