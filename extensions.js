@@ -2971,7 +2971,7 @@ try {
                 // Adobe DTM
                 'DTM': ".*assets\.adobedtm\.com.*satelliteLib-.*\.js",
                 // Google GTM
-                'GTM': "*gtm\.js",
+                'GTM': ".*gtm\.js",
                 // Tealium TiQ
                 'TiQ': ".*tags\.tiqcdn\.com\/utag.*utag.*\.js"
             };
