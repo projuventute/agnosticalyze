@@ -2960,7 +2960,7 @@ try {
 // +++++++++++++++++++++++++++++++++++++++++++++++++++++++
 // 1041 TMSConfig.tmsConfig_tmsList
 // Issued by: Agnosticalyze
-// version: 1.1, 2021-02-15
+// version: 1.2, 2025-01-14
 // +++++++++++++++++++++++++++++++++++++++++++++++++++++++
  
 // Define relevant TMS and provide tool-specific regex to match script source URLs against
